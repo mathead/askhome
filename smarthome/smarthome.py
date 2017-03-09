@@ -1,0 +1,2 @@
+class Smarthome(object):
+    pass
