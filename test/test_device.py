@@ -1,7 +1,7 @@
 from smarthome import Device
 
 
-def test_device_action_definition():
+def test_action_definition():
     class Light(Device):
         @Device.action
         def turn_on(self, request):
@@ -18,7 +18,7 @@ def test_device_action_definition():
     assert Light.actions == {"turnOn": Light.turn_on.__func__}
 
 
-def test_device_action_for_definition():
+def test_action_for_definition():
     class Light(Device):
         @Device.action_for("turnOn", "turnOff", "setPercentage")
         def control(self, request):
@@ -31,7 +31,7 @@ def test_device_action_for_definition():
     }
 
 
-def test_device_query_definition():
+def test_query_definition():
     class Light(Device):
         @Device.query
         def get_target_temperature(self, request):

@@ -3,21 +3,6 @@ import pytest
 
 
 @pytest.fixture
-def discover_request():
-    return {
-        "header": {
-            "messageId": "6d6d6e14-8aee-473e-8c24-0d31ff9c17a2",
-            "name": "DiscoverAppliancesRequest",
-            "namespace": "Alexa.ConnectedHome.Discovery",
-            "payloadVersion": "2"
-        },
-        "payload": {
-            "accessToken": "OAuth Token"
-        }
-    }
-
-
-@pytest.fixture
 def discover_response():
     return {
         "header": {
@@ -46,7 +31,7 @@ def discover_response():
     }
 
 
-def test_smarthome_handle_discover(discover_request, discover_response):
+def test_handle_discover(discover_request, discover_response):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
@@ -60,7 +45,7 @@ def test_smarthome_handle_discover(discover_request, discover_response):
     assert response == discover_response
 
 
-def test_smarthome_discover_decorator(discover_request, discover_response):
+def test_discover_decorator(discover_request, discover_response):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
@@ -78,7 +63,7 @@ def test_smarthome_discover_decorator(discover_request, discover_response):
     assert response == discover_response
 
 
-def test_smarthome_discover_device_details(discover_request):
+def test_discover_device_details(discover_request):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
@@ -95,4 +80,5 @@ def test_smarthome_discover_device_details(discover_request):
 
     assert response["payload"]["discoveredAppliances"][0]["manufacturerName"] == "EvilCorp"
     assert response["payload"]["discoveredAppliances"][1]["manufacturerName"] == "GoodCorp"
+
 
