@@ -16,11 +16,12 @@ def test_action_definition():
     # Test that the actions are independent in each class
     assert l.actions["turnOn"](l, None) == 1
     assert Light.actions == {"turnOn": Light.turn_on.__func__}
+    assert Light.request_handlers == {"TurnOnRequest": Light.turn_on.__func__}
 
 
 def test_action_for_definition():
     class Light(Device):
-        @Device.action_for("turnOn", "turnOff", "setPercentage")
+        @Device.action_for("turnOn", "TurnOffRequest", "set_percentage")
         def control(self, request):
             return 1
 
@@ -28,6 +29,11 @@ def test_action_for_definition():
         "turnOn": Light.control.__func__,
         "turnOff": Light.control.__func__,
         "setPercentage": Light.control.__func__,
+    }
+    assert Light.request_handlers == {
+        "TurnOnRequest": Light.control.__func__,
+        "TurnOffRequest": Light.control.__func__,
+        "SetPercentageRequest": Light.control.__func__,
     }
 
 
@@ -39,4 +45,4 @@ def test_query_definition():
 
     l = Light()
     assert len(l.actions) == 0
-    assert Light.queries == {"getTargetTemperature": Light.get_target_temperature.__func__}
+    assert Light.request_handlers == {"GetTargetTemperatureRequest": Light.get_target_temperature.__func__}
