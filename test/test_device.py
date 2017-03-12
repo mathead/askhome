@@ -1,4 +1,4 @@
-from smarthome import Device
+from smarthome import Device, Request
 
 
 def test_action_definition():
@@ -46,3 +46,25 @@ def test_query_definition():
     l = Light()
     assert len(l.actions) == 0
     assert Light.request_handlers == {"GetTargetTemperatureRequest": Light.get_target_temperature.__func__}
+
+
+def test_init():
+    request = Request({
+        "header": {
+            "messageId": "01ebf625-0b89-4c4d-b3aa-32340e894688",
+            "name": "TurnOnRequest",
+            "namespace": "Alexa.ConnectedHome.Control",
+            "payloadVersion": "2"
+        },
+        "payload": {
+            "accessToken": "[OAuth token here]",
+            "appliance": {
+                "additionalApplianceDetails": {"foo": "bar"},
+                "applianceId": "light1"
+            }
+        }
+    })
+    device = Device(request)
+
+    assert device.id == "light1"
+    assert device.additional_details == {"foo": "bar"}

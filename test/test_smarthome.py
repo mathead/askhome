@@ -37,7 +37,7 @@ def test_handle_discover(discover_request, discover_response):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
-            return {}
+            pass
 
     home = Smarthome()
     home.add_device('123', Light, friendly_name="Kitchen Light")
@@ -51,25 +51,65 @@ def test_discover_decorator(discover_request, discover_response):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
-            return {}
+            pass
 
     home = Smarthome()
 
-    @home.handle_discovery
+    @home.discover
     def discover(request):
         home.add_device('123', Light, friendly_name="Kitchen Light")
-        return home.discover(request)
+        return request.response(home)
 
     response = home.lambda_handler(discover_request)
 
     assert response == discover_response
 
 
+def test_get_device_decorator():
+    class Light(Device):
+        @Device.action
+        def turn_on(self, request):
+            return {"foo": "bar"}
+
+    home = Smarthome()
+
+    @home.get_device
+    def get_device(request):
+        return Light
+
+    request = {
+        "header": {
+            "messageId": "01ebf625-0b89-4c4d-b3aa-32340e894688",
+            "name": "TurnOnRequest",
+            "namespace": "Alexa.ConnectedHome.Control",
+            "payloadVersion": "2"
+        },
+        "payload": {
+            "accessToken": "[OAuth token here]",
+            "appliance": {
+                "additionalApplianceDetails": {},
+                "applianceId": "light1"
+            }
+        }
+    }
+    response = home.lambda_handler(request)
+
+    assert response == {
+        "header": {
+            "messageId": "01ebf625-0b89-4c4d-b3aa-32340e894688",
+            "name": "TurnOnConfirmation",
+            "namespace": "Alexa.ConnectedHome.Control",
+            "payloadVersion": "2"
+        },
+        "payload": {"foo": "bar"}
+    }
+
+
 def test_discover_device_details(discover_request):
     class Light(Device):
         @Device.action
         def turn_on(self, request):
-            return {}
+            pass
 
         class Details:
             manufacturer = "EvilCorp"

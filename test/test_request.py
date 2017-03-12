@@ -2,8 +2,11 @@ from smarthome import Request
 
 
 def test_discovery_request(discover_request):
-    request = Request(discover_request)
+    request = Request(discover_request, {"context": "object"})
     assert request.data == discover_request
+    assert request.header == discover_request["header"]
+    assert request.payload == discover_request["payload"]
+    assert request.context == {"context": "object"}
     assert request.name == "DiscoverAppliancesRequest"
 
 
