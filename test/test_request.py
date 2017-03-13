@@ -31,17 +31,17 @@ def test_set_temperature_request():
         }
     })
 
-    assert request.appliance.id == 'thermostat1'
-    assert request.appliance.additional_details == {'foo': 'bar'}
-    assert request.temperature.target == 27.6
-    assert request.temperature.delta is None
+    assert request.appliance_id == 'thermostat1'
+    assert request.appliance_details == {'foo': 'bar'}
+    assert request.temperature == 27.6
+    assert request.delta_temperature is None
 
 
 def test_increment_temperature_response():
     request = Request({
         'header': {
             'namespace': 'Alexa.ConnectedHome.Control',
-            'name': 'IncrementTemperatureRequest',
+            'name': 'IncrementTargetTemperatureRequest',
             'payloadVersion': '2',
             'messageId': '23624201-23a5-44c3-8fdc-ec6c4b6c3df8'
         },
@@ -58,17 +58,17 @@ def test_increment_temperature_response():
 
     assert request.response_header() == {
         'namespace': 'Alexa.ConnectedHome.Control',
-        'name': 'SetTargetTemperatureConfirmation',
+        'name': 'IncrementTargetTemperatureConfirmation',
         'payloadVersion': '2',
         'messageId': '23624201-23a5-44c3-8fdc-ec6c4b6c3df8'
     }
 
     assert request.response(temperature=28.6, mode='HEAT', previous_temperature=27.6) == {
         'header': {
-            'messageId': '780013dd-99d0-4c69-9e35-db0457f9f2a7',
-            'name': 'IncrementTargetTemperatureConfirmation',
             'namespace': 'Alexa.ConnectedHome.Control',
-            'payloadVersion': '2'
+            'name': 'IncrementTargetTemperatureConfirmation',
+            'payloadVersion': '2',
+            'messageId': '23624201-23a5-44c3-8fdc-ec6c4b6c3df8'
         },
         'payload': {
             'previousState': {

@@ -7,14 +7,14 @@ class classproperty(property):
 
 
 def get_action_string(func_name):
-    return _strip_end(inflection.camelize(func_name, False), 'Request')
+    return rstrip_word(inflection.camelize(func_name, False), 'Request')
 
 
 def get_request_string(func_name):
-    return _strip_end(inflection.camelize(func_name), 'Request') + 'Request'
+    return rstrip_word(inflection.camelize(func_name), 'Request') + 'Request'
 
 
-def _strip_end(text, suffix):
+def rstrip_word(text, suffix):
     if not text.endswith(suffix):
         return text
     return text[:len(text)-len(suffix)]
