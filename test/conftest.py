@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def discover_request():
     return {
         "header": {

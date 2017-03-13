@@ -1,7 +1,7 @@
 from .utils import get_action_string, get_request_string, classproperty
 
 
-class Device(object):
+class Appliance(object):
     @classmethod
     def action(cls, func):
         last = getattr(func, 'ask_actions', [])
