@@ -40,7 +40,7 @@ def test_handle_discover(discover_request, discover_response):
             pass
 
     home = Smarthome()
-    home.add_appliance('123', Light, friendly_name='Kitchen Light')
+    home.add_appliance('123', Light, name='Kitchen Light')
 
     response = home.lambda_handler(discover_request)
 
@@ -57,7 +57,7 @@ def test_discover_decorator(discover_request, discover_response):
 
     @home.discover
     def discover(request):
-        home.add_appliance('123', Light, friendly_name='Kitchen Light')
+        home.add_appliance('123', Light, name='Kitchen Light')
         return request.response(home)
 
     response = home.lambda_handler(discover_request)
@@ -114,14 +114,23 @@ def test_discover_appliance_details(discover_request):
         class Details:
             manufacturer = 'EvilCorp'
 
-    home = Smarthome()
-    home.add_appliance('123', Light, friendly_name='Kitchen Light')
-    home.add_appliance('456', Light, friendly_name='Bedroom Light', manufacturer='GoodCorp')
+    class Door(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            pass
+
+    home = Smarthome(manufacturer='NeutralCorp')
+    home.add_appliance('1', Light, name='Kitchen Light')
+    home.add_appliance('2', Light, name='Bedroom Light', manufacturer='GoodCorp')
+    home.add_appliance('3', Door, name='Front Door', manufacturer='NeutralCorp')
 
     response = home.lambda_handler(discover_request)
 
-    assert response['payload']['discoveredAppliances'][0]['manufacturerName'] == 'EvilCorp'
-    assert response['payload']['discoveredAppliances'][1]['manufacturerName'] == 'GoodCorp'
+    appls = {appl['applianceId']: appl['manufacturerName']
+             for appl in response['payload']['discoveredAppliances']}
+    assert appls['1'] == 'EvilCorp'
+    assert appls['2'] == 'GoodCorp'
+    assert appls['3'] == 'NeutralCorp'
 
 
 def test_full_usage(discover_request):
@@ -139,7 +148,7 @@ def test_full_usage(discover_request):
             return request.response(27.6)
 
     home = Smarthome()
-    home.add_appliance('light1', Light, friendly_name='Kitchen Light')
+    home.add_appliance('light1', Light, name='Kitchen Light')
 
     response = home.lambda_handler(discover_request)
     assert response == {
@@ -153,8 +162,8 @@ def test_full_usage(discover_request):
             'discoveredAppliances': [
                 {
                     'actions': [
-                        'turnOn',
-                        'setTemperature'
+                        'setTargetTemperature',
+                        'turnOn'
                     ],
                     'additionalApplianceDetails': {},
                     'applianceId': 'light1',
@@ -185,15 +194,13 @@ def test_full_usage(discover_request):
         }
     })
     assert response == {
-        {
-            'header': {
-                'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
-                'name': 'TurnOnConfirmation',
-                'namespace': 'Alexa.ConnectedHome.Control',
-                'payloadVersion': '2'
-            },
-            'payload': {}
-        }
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnConfirmation',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {}
     }
 
     response = home.lambda_handler({

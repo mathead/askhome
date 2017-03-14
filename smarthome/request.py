@@ -73,13 +73,13 @@ class Request(object):
     @staticmethod
     def discover_payload(smarthome):
         discovered = []
-        for appl_id, (appl, details) in smarthome.appliances:
+        for appl_id, (appl, details) in smarthome.appliances.iteritems():
             # Helper function to get detail in hierarchy:
             # Smarthome.add_device kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
             def get_detail(name, default=''):
                 if name in details:
                     return details[name]
-                if hasattr(appl.Details, name):
+                if hasattr(appl, 'Details') and hasattr(appl.Details, name):
                     return getattr(appl.Details, name)
                 return smarthome.details.get(name, default)
 
@@ -87,16 +87,16 @@ class Request(object):
                 'applianceId': appl_id,
                 'manufacturerName': get_detail('manufacturer'),
                 'modelName': get_detail('model'),
-                'version': get_detail('version', '1'),
+                'version': get_detail('version'),
                 'friendlyName': get_detail('name'),
                 'friendlyDescription': get_detail('description'),
                 'isReachable': get_detail('reachable', True),
                 'additionalApplianceDetails': get_detail('additional_details', {}),
-                'actions': sorted(appl.actions.values()),  # sorted for easier testing
+                'actions': sorted(appl.actions.keys()),  # sorted for easier testing
             }
             discovered.append(serialized)
 
-        return {'discoveredAppliance': discovered}
+        return {'discoveredAppliances': discovered}
 
     @staticmethod
     def set_temperature_payload(temperature, mode='AUTO', previous_temperature=None, previous_mode='AUTO'):
@@ -157,13 +157,14 @@ class Request(object):
             'description': description
         }
 
-    def response(self, payload=None, timestamp=None, *args, **kwargs):
-        if payload is not None:
-            return {'header': self.response_header(), 'payload': payload}
+    def response(self, *args, **kwargs):
+        if 'payload' in kwargs:
+            return {'header': self.response_header(), 'payload': kwargs['payload']}
 
         payload = {}
 
-        if timestamp is not None:
+        if 'timestamp' in kwargs:
+            timestamp = kwargs['timestamp']
             if isinstance(timestamp, datetime):
                 # Format datetime according to documentation
                 payload['applianceResponseTimestamp'] = timestamp.replace(microsecond=0).isoformat()
@@ -186,3 +187,9 @@ class Request(object):
             payload = self.get_temperature_reading_payload(*args, **kwargs)
 
         return {'header': self.response_header(), 'payload': payload}
+
+    def exception_response(self, exception):
+        header = self.response_header(exception.name)
+        header['namespace'] = exception.namespace
+
+        return {'header': header, 'payload': exception.payload}

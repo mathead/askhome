@@ -2,6 +2,12 @@ from .utils import get_action_string, get_request_string, classproperty
 
 
 class Appliance(object):
+    def __init__(self, request=None):
+        if request is not None:
+            self.request = request
+            self.id = request.appliance_id
+            self.additional_details = request.appliance_details
+
     @classmethod
     def action(cls, func):
         last = getattr(func, 'ask_actions', [])
