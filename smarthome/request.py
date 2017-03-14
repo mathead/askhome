@@ -189,6 +189,7 @@ class Request(object):
         return {'header': self.response_header(), 'payload': payload}
 
     def exception_response(self, exception):
+        # Use exception class name as response name
         header = self.response_header(exception.name)
         header['namespace'] = exception.namespace
 
