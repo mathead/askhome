@@ -133,6 +133,66 @@ def test_discover_appliance_details(discover_request):
     assert appls['3'] == 'NeutralCorp'
 
 
+def test_appliance_not_found():
+    class Light(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            pass
+
+    home = Smarthome()
+    home.add_appliance('light1', Light)
+
+    response = home.lambda_handler({
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnRequest',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'accessToken': '[OAuth token here]',
+            'appliance': {
+                'additionalApplianceDetails': {},
+                'applianceId': 'light2'
+            }
+        }
+    })
+    assert response == {
+        'header': {
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'name': 'UnsupportedTargetError',
+            'payloadVersion': '2',
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688'
+        },
+        'payload': {}
+    }
+
+    response = home.lambda_handler({
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOffRequest',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'accessToken': '[OAuth token here]',
+            'appliance': {
+                'additionalApplianceDetails': {},
+                'applianceId': 'light1'
+            }
+        }
+    })
+    assert response == {
+        'header': {
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'name': 'UnsupportedOperationError',
+            'payloadVersion': '2',
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688'
+        },
+        'payload': {}
+    }
+
+
 def test_full_usage(discover_request):
     class Light(Appliance):
         @Appliance.action
@@ -229,4 +289,36 @@ def test_full_usage(discover_request):
             'messageId': 'b6602211-b4b3-4960-b063-f7e3967c00c4'
         },
         'payload': {}
+    }
+
+    response = home.lambda_handler({
+        'header': {
+            'messageId': 'b6602211-b4b3-4960-b063-f7e3967c00c4',
+            'name': 'GetTargetTemperatureRequest',
+            'namespace': 'Alexa.ConnectedHome.Query',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'accessToken': '[OAuth token here]',
+            'appliance': {
+                'additionalApplianceDetails': {},
+                'applianceId': 'light1'
+            }
+        }
+    })
+    assert response == {
+        'header': {
+            'namespace': 'Alexa.ConnectedHome.Query',
+            'name': 'GetTargetTemperatureResponse',
+            'payloadVersion': '2',
+            'messageId': 'b6602211-b4b3-4960-b063-f7e3967c00c4'
+        },
+        'payload': {
+            'targetTemperature': {
+                'value': 27.6
+            },
+            'temperatureMode': {
+                'value': 'AUTO'
+            }
+        }
     }

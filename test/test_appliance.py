@@ -46,6 +46,7 @@ def test_query_definition():
     l = Light()
     assert len(l.actions) == 0
     assert Light.request_handlers == {'GetTargetTemperatureRequest': Light.get_target_temperature.__func__}
+    assert l.request_handlers['GetTargetTemperatureRequest'](l, None) == 42
 
 
 def test_init():

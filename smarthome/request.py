@@ -3,6 +3,8 @@ from datetime import datetime
 from .utils import rstrip_word
 
 
+# TODO create_request and Request subclasses
+
 class Request(object):
     def __init__(self, data, context=None):
         self.data = data
@@ -11,7 +13,7 @@ class Request(object):
         self.header = data['header']
         self.payload = data['payload']
         self.name = self.header['name']
-        self.access_token = self.payload['accessToken']
+        self.access_token = self.payload.get('accessToken', None)
 
     @property
     def appliance_id(self):
@@ -159,17 +161,13 @@ class Request(object):
 
     def response(self, *args, **kwargs):
         if 'payload' in kwargs:
-            return {'header': self.response_header(), 'payload': kwargs['payload']}
+            return {'header': self.response_header(), 'payload': kwargs.pop('payload')}
 
         payload = {}
 
+        timestamp = None
         if 'timestamp' in kwargs:
-            timestamp = kwargs['timestamp']
-            if isinstance(timestamp, datetime):
-                # Format datetime according to documentation
-                payload['applianceResponseTimestamp'] = timestamp.replace(microsecond=0).isoformat()
-            else:
-                payload['applianceResponseTimestamp'] = timestamp
+            timestamp = kwargs.pop('timestamp')
 
         # Get payload from methods of specific requests
         if self.name == 'DiscoverAppliancesRequest':
@@ -185,6 +183,20 @@ class Request(object):
 
         elif self.name == 'GetTemperatureReadingRequest':
             payload = self.get_temperature_reading_payload(*args, **kwargs)
+
+        elif self.name in ('SetLockStateRequest', 'GetLockStateRequest'):
+            payload = self.lock_state_payload(*args, **kwargs)
+
+        elif self.name == 'HealthCheckRequest':
+            payload = self.health_check_payload(*args, **kwargs)
+
+        # Add timestamp to payload if set
+        if timestamp is not None:
+            if isinstance(timestamp, datetime):
+                # Format datetime according to documentation
+                payload['applianceResponseTimestamp'] = timestamp.replace(microsecond=0).isoformat()
+            else:
+                payload['applianceResponseTimestamp'] = timestamp
 
         return {'header': self.response_header(), 'payload': payload}
 

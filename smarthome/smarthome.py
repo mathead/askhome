@@ -1,4 +1,4 @@
-from .exceptions import SmartHomeException
+from .exceptions import SmartHomeException, UnsupportedTargetError, UnsupportedOperationError
 from .request import Request
 
 
@@ -24,19 +24,26 @@ class Smarthome(object):
         request = Request(data, context)
 
         try:
+            # Handle discover request
             if request.name == 'DiscoverAppliancesRequest':
                 if self._discover_func is None:
                     return request.response(self)
                 return self._discover_func(request)
 
-            # TODO raise
+            # Find the according appliance
             if self._get_appliance_func is None:
+                # Appliance not found - return error response
+                if request.appliance_id not in self.appliances:
+                    raise UnsupportedTargetError
                 appliance = self.appliances[request.appliance_id][0](request)
             else:
                 appliance = self._get_appliance_func(request)
 
-            # TODO raise
+            # Appliance doesn't handle requested operation - return error response
+            if request.name not in appliance.request_handlers:
+                raise UnsupportedOperationError
             response = appliance.request_handlers[request.name](appliance, request)
+
             if response is None:
                 return request.response()
             return response
