@@ -1,4 +1,4 @@
-from askhome import Appliance, Request
+from askhome import Appliance, create_request
 
 
 def test_action_definition():
@@ -55,7 +55,7 @@ def test_query_definition():
 
 
 def test_init():
-    request = Request({
+    request = create_request({
         'header': {
             'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
             'name': 'TurnOnRequest',

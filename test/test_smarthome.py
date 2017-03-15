@@ -59,7 +59,7 @@ def test_get_device_decorator():
     class Light(Appliance):
         @Appliance.action
         def turn_on(self, request):
-            return request.response(payload={'foo': 'bar'})
+            return request.raw_response({'foo': 'bar'})
 
     home = Smarthome()
 

@@ -1,5 +1,5 @@
 from .exceptions import SmartHomeException, UnsupportedTargetError, UnsupportedOperationError
-from .request import Request
+from .requests import create_request
 
 
 class Smarthome(object):
@@ -21,7 +21,7 @@ class Smarthome(object):
         self.appliances[appl_id] = (appl_class, details)
 
     def lambda_handler(self, data, context=None):
-        request = Request(data, context)
+        request = create_request(data, context)
 
         try:
             # Handle discover request

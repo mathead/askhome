@@ -1,3 +1,3 @@
 from .appliance import Appliance
 from .smarthome import Smarthome
-from .request import Request
+from .requests import create_request

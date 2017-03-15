@@ -1,9 +1,9 @@
-from askhome import Request
+from askhome import create_request
 from askhome.exceptions import *
 
 
 def test_exceptions(discover_request):
-    request = Request(discover_request)
+    request = create_request(discover_request)
 
     assert request.exception_response(
         SmartHomeException(name='CustomError', payload={'foo': 'bar'})) == {

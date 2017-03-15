@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from askhome import Request
+from askhome import create_request
 
 
 def test_discovery_request(discover_request):
-    request = Request(discover_request, {'context': 'object'})
+    request = create_request(discover_request, {'context': 'object'})
     assert request.data == discover_request
     assert request.header == discover_request['header']
     assert request.payload == discover_request['payload']
@@ -16,7 +16,7 @@ def test_discovery_request(discover_request):
 
 
 def test_set_temperature_request():
-    request = Request({
+    request = create_request({
         'header': {
             'namespace': 'Alexa.ConnectedHome.Control',
             'name': 'SetTargetTemperatureRequest',
@@ -42,7 +42,7 @@ def test_set_temperature_request():
 
 
 def test_increment_temperature_response():
-    request = Request({
+    request = create_request({
         'header': {
             'namespace': 'Alexa.ConnectedHome.Control',
             'name': 'IncrementTargetTemperatureRequest',
@@ -97,7 +97,7 @@ def test_increment_temperature_response():
 
 
 def test_get_temperature_response():
-    request = Request({
+    request = create_request({
         'header': {
             'namespace': 'Alexa.ConnectedHome.Query',
             'name': 'GetTargetTemperatureRequest',
@@ -137,7 +137,7 @@ def test_get_temperature_response():
 
 
 def test_temperature_reading_response():
-    request = Request({
+    request = create_request({
         'header': {
             'namespace': 'Alexa.ConnectedHome.Query',
             'name': 'GetTemperatureReadingRequest',
@@ -169,7 +169,7 @@ def test_temperature_reading_response():
 
 
 def test_increment_percentage():
-    request = Request({
+    request = create_request({
         'header': {
             'messageId': '95872301-4ff6-4146-b3a4-ae84c760c13e',
             'name': 'IncrementPercentageRequest',
@@ -193,7 +193,7 @@ def test_increment_percentage():
 
 
 def test_set_percentage_custom_payload_response():
-    request = Request({
+    request = create_request({
         'header': {
             'messageId': '95872301-4ff6-4146-b3a4-ae84c760c13e',
             'name': 'SetPercentageRequest',
@@ -215,7 +215,7 @@ def test_set_percentage_custom_payload_response():
     assert request.percentage == 50.0
     assert request.delta_percentage is None
 
-    assert request.response(payload={'foo': 'bar'}) == {
+    assert request.raw_response(payload={'foo': 'bar'}) == {
         'header': {
             'messageId': '95872301-4ff6-4146-b3a4-ae84c760c13e',
             'name': 'SetPercentageConfirmation',
@@ -227,7 +227,7 @@ def test_set_percentage_custom_payload_response():
 
 
 def test_set_lock_state():
-    request = Request({
+    request = create_request({
         'header': {
             'messageId': '95872301-4ff6-4146-b3a4-ae84c760c13e',
             'name': 'SetLockStateRequest',
@@ -240,13 +240,13 @@ def test_set_lock_state():
                 'additionalApplianceDetails': {},
                 'applianceId': '[Device ID for front door lock appliance]'
             },
-            'lockState': 'LOCKED'
+            'lockState': 'LOCKED',
         }
     })
 
     assert request.lock_state == 'LOCKED'
 
-    assert request.response('UNLOCKED') == {
+    assert request.response('UNLOCKED', timestamp='2017-01-12T23:20:50.52Z') == {
         'header': {
             'messageId': '95872301-4ff6-4146-b3a4-ae84c760c13e',
             'name': 'SetLockStateConfirmation',
@@ -254,13 +254,14 @@ def test_set_lock_state():
             'payloadVersion': '2'
         },
         'payload': {
-            'lockState': 'UNLOCKED'
+            'lockState': 'UNLOCKED',
+            'applianceResponseTimestamp': '2017-01-12T23:20:50.52Z'
         }
     }
 
 
 def test_health_check():
-    request = Request({
+    request = create_request({
         'header': {
             'messageId': '243550dc-5f95-4ae4-ad43-4e1e7cb037fd',
             'name': 'HealthCheckRequest',
@@ -271,9 +272,6 @@ def test_health_check():
             'initiationTimestamp': '1435302567000'
         }
     })
-
-    # Just for that sweet 100% test coverage
-    assert request.lock_state is None
 
     assert request.response(False, 'The system is currently not healthy') == {
         'header': {
