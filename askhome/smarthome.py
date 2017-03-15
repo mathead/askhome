@@ -9,9 +9,6 @@ class Smarthome(object):
         self._discover_func = None
         self._get_appliance_func = None
 
-    def __call__(self, data, context=None):
-        return self.lambda_handler(data, context)
-
     def discover(self, func):
         self._discover_func = func
         return func
