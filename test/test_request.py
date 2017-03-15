@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from smarthome import Request
+from askhome import Request
 
 
 def test_discovery_request(discover_request):

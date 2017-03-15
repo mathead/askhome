@@ -1,7 +1,7 @@
 import pytest
 
-from smarthome import Smarthome, Appliance
-from smarthome.exceptions import TargetOfflineError
+from askhome import Smarthome, Appliance
+from askhome.exceptions import TargetOfflineError
 
 
 @pytest.fixture

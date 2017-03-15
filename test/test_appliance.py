@@ -1,4 +1,4 @@
-from smarthome import Appliance, Request
+from askhome import Appliance, Request
 
 
 def test_action_definition():
