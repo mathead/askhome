@@ -9,6 +9,9 @@ class Smarthome(object):
         self._discover_func = None
         self._get_appliance_func = None
 
+    def __call__(self, data, context=None):
+        return self.lambda_handler(data, context)
+
     def discover(self, func):
         self._discover_func = func
         return func
@@ -17,6 +20,7 @@ class Smarthome(object):
         self._get_appliance_func = func
         return func
 
+    # TODO: explicit kwargs
     def add_appliance(self, appl_id, appl_class, **details):
         self.appliances[appl_id] = (appl_class, details)
 
