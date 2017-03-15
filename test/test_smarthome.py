@@ -33,12 +33,7 @@ def discover_response():
     }
 
 
-def test_handle_discover(discover_request, discover_response):
-    class Light(Appliance):
-        @Appliance.action
-        def turn_on(self, request):
-            pass
-
+def test_handle_discover(discover_request, discover_response, Light):
     home = Smarthome()
     home.add_appliance('123', Light, name='Kitchen Light')
 
@@ -47,12 +42,7 @@ def test_handle_discover(discover_request, discover_response):
     assert response == discover_response
 
 
-def test_discover_decorator(discover_request, discover_response):
-    class Light(Appliance):
-        @Appliance.action
-        def turn_on(self, request):
-            pass
-
+def test_discover_decorator(discover_request, discover_response, Light):
     home = Smarthome()
 
     @home.discover
@@ -105,24 +95,19 @@ def test_get_device_decorator():
     }
 
 
-def test_discover_appliance_details(discover_request):
-    class Light(Appliance):
+def test_discover_appliance_details(discover_request, Light):
+    class Door(Appliance):
         @Appliance.action
         def turn_on(self, request):
-            pass
+            return 1
 
         class Details:
             manufacturer = 'EvilCorp'
 
-    class Door(Appliance):
-        @Appliance.action
-        def turn_on(self, request):
-            pass
-
     home = Smarthome(manufacturer='NeutralCorp')
-    home.add_appliance('1', Light, name='Kitchen Light')
-    home.add_appliance('2', Light, name='Bedroom Light', manufacturer='GoodCorp')
-    home.add_appliance('3', Door, name='Front Door', manufacturer='NeutralCorp')
+    home.add_appliance('1', Door, name='Front Door')
+    home.add_appliance('2', Door, name='Back Door', manufacturer='GoodCorp')
+    home.add_appliance('3', Light, name='Kitchen Light', manufacturer='NeutralCorp')
 
     response = home.lambda_handler(discover_request)
 
@@ -132,13 +117,40 @@ def test_discover_appliance_details(discover_request):
     assert appls['2'] == 'GoodCorp'
     assert appls['3'] == 'NeutralCorp'
 
+    # Just for that coverage
+    assert Door.actions['turnOn'](None, None) == 1
 
-def test_appliance_not_found():
-    class Light(Appliance):
-        @Appliance.action
-        def turn_on(self, request):
-            pass
 
+def test_action_return_none(Light):
+    home = Smarthome()
+    home.add_appliance('light1', Light)
+    response = home.lambda_handler({
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnRequest',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'accessToken': '[OAuth token here]',
+            'appliance': {
+                'additionalApplianceDetails': {},
+                'applianceId': 'light1'
+            }
+        }
+    })
+    assert response == {
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnConfirmation',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {}
+    }
+
+
+def test_appliance_not_found(Light):
     home = Smarthome()
     home.add_appliance('light1', Light)
 

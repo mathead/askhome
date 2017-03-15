@@ -13,8 +13,10 @@ def test_action_definition():
             return 2
 
     l = Light()
+    d = Door()
     # Test that the actions are independent in each class
     assert l.actions['turnOn'](l, None) == 1
+    assert d.actions['turnOn'](l, None) == 2
     assert Light.actions == {'turnOn': Light.turn_on.__func__}
     assert Light.request_handlers == {'TurnOnRequest': Light.turn_on.__func__}
 
@@ -25,6 +27,9 @@ def test_action_for_definition():
         def control(self, request):
             return 1
 
+    l = Light()
+
+    assert l.actions['turnOn'](l, None) == 1
     assert Light.actions == {
         'turnOn': Light.control.__func__,
         'turnOff': Light.control.__func__,

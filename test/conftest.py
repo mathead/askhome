@@ -1,5 +1,7 @@
 import pytest
 
+from askhome import Appliance
+
 
 @pytest.fixture(scope='module')
 def discover_request():
@@ -14,3 +16,13 @@ def discover_request():
             "accessToken": "OAuth Token"
         }
     }
+
+
+@pytest.fixture(scope='module')
+def Light():
+    class Light2(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            pass
+
+    return Light2

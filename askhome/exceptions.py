@@ -10,6 +10,9 @@ class SmartHomeException(Exception):
 
         # Name in request header is same as class name
         self.name = type(self).__name__
+        if 'name' in kwargs:
+            self.name = kwargs.pop('name')
+
         super(SmartHomeException, self).__init__(*args, **kwargs)
 
 
@@ -102,6 +105,15 @@ class UnwillingToSetValueError(SmartHomeException):
         if error_description is not None:
             self.payload['errorInfo']['description'] = error_description
         super(UnwillingToSetValueError, self).__init__(*args, **kwargs)
+
+
+class RateLimitExceededError(SmartHomeException):
+    def __init__(self, rate_limit, time_unit='HOUR', *args, **kwargs):
+        self.payload = {
+            'rateLimit': rate_limit,
+            'timeUnit': time_unit
+        }
+        super(RateLimitExceededError, self).__init__(*args, **kwargs)
 
 
 class NotSupportedInCurrentModeError(SmartHomeException):
