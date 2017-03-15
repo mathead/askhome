@@ -6,4 +6,7 @@ setup(
     packages=['askhome'],
     license='MIT',
     long_description="Alexa Skills Kit library for working with Smart Home Skill API",
+    install_requires=[
+        'inflection'
+    ],
 )
