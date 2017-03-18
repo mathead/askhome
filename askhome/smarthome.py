@@ -1,6 +1,6 @@
 import json
 
-from .exceptions import SmartHomeException, UnsupportedTargetError, UnsupportedOperationError
+from .exceptions import AskhomeException, UnsupportedTargetError, UnsupportedOperationError
 from .requests import create_request
 from . import logger
 
@@ -62,5 +62,5 @@ class Smarthome(object):
                 return request.response()
             return response
 
-        except SmartHomeException as exception:
+        except AskhomeException as exception:
             return request.exception_response(exception)

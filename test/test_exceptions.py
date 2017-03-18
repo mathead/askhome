@@ -6,7 +6,7 @@ def test_exceptions(discover_request):
     request = create_request(discover_request)
 
     assert request.exception_response(
-        SmartHomeException(name='CustomError', payload={'foo': 'bar'})) == {
+        AskhomeException(name='CustomError', payload={'foo': 'bar'})) == {
         'header': {
             'namespace': 'Alexa.ConnectedHome.Control',
             'name': 'CustomError',
