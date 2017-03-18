@@ -128,34 +128,14 @@ class Request(object):
 class DiscoverRequest(Request):
     """Request class for Alexa DiscoverAppliancesRequest."""
     def response(self, smarthome):
-        """Generate DiscoverAppliancesResponse from appliances added to the passed Smarthome.
+        """Generate DiscoverAppliancesResponse from appliances added to the passed `Smarthome`.
 
-        Details of each appliance are resolve in order of priority:
-        Smarthome.add_device kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
+        Details of each appliance are resolved in order of priority:
+        `Smarthome.add_device` kwargs -> `Appliance.Details` -> `Smarthome.__init__` kwargs
         """
         discovered = []
-        for appl_id, (appl, details) in smarthome.appliances.iteritems():
-            # Helper function to get detail in hierarchy:
-            # Smarthome.add_device kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
-            def get_detail(name, default=''):
-                if name in details:
-                    return details[name]
-                if hasattr(appl, 'Details') and hasattr(appl.Details, name):
-                    return getattr(appl.Details, name)
-                return smarthome.details.get(name, default)
-
-            serialized = {
-                'applianceId': appl_id,
-                'manufacturerName': get_detail('manufacturer', 'Unknown manufacturer'),
-                'modelName': get_detail('model', 'Unknown model'),
-                'version': get_detail('version', 'v1'),
-                'friendlyName': get_detail('name'),
-                'friendlyDescription': get_detail('description', 'No description'),
-                'isReachable': get_detail('reachable', True),
-                'additionalApplianceDetails': get_detail('additional_details', {}),
-                'actions': sorted(appl.actions.keys()),  # sorted for easier testing
-            }
-            discovered.append(serialized)
+        for appl, details in smarthome.appliances.values():
+            discovered.append(details)
 
         return self.raw_response({'discoveredAppliances': discovered})
 

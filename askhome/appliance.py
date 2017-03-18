@@ -20,7 +20,7 @@ class Appliance(object):
     Attributes:
         request (Request): Currently processed request.
         id (str): Identifier of the appliance from the appliance.applianceId of request payload.
-        additional_details (dict): Information that was sent for the DiscoverApplianceRequest.
+        additional_details (dict): Information that was sent for the DiscoverAppliancesRequest.
             Some instance specific details can be saved here.
 
     """
@@ -36,7 +36,7 @@ class Appliance(object):
 
     @classmethod
     def action(cls, func):
-        """Decorator for marking the method as an action sent for the DiscoverApplianceRequest.
+        """Decorator for marking the method as an action sent for the DiscoverAppliancesRequest.
 
         The action name is generated from the camelCased method name (e.g. turn_on -> turnOn).
         The decorated method should take request as an argument, specific subclass of `Request` is
@@ -78,7 +78,7 @@ class Appliance(object):
     @classmethod
     def actions(cls):
         """dict(str: function): All actions the appliance supports and their corresponding (unbound)
-        method references. Action names are formatted for the DiscoverApplianceRequest.
+        method references. Action names are formatted for the DiscoverAppliancesRequest.
         """
         ret = {}
         for method in cls.__dict__.values():
