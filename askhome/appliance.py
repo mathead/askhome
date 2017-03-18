@@ -15,7 +15,7 @@ class Appliance(object):
     corresponding decorated method.
 
     Appliance subclass can also contain a `Details` inner class for instance defaults during
-    discovery.
+    discovery (see `Smarthome.add_device` for possible attributes).
 
     Attributes:
         request (Request): Currently processed request.
@@ -26,7 +26,7 @@ class Appliance(object):
     """
 
     def __init__(self, request=None):
-        """Appliance gets initialized just before its query and action methods are called. Put your
+        """Appliance gets initialized just before its action methods are called. Put your
         logic for preparation before handling the request here.
         """
         if request is not None:
@@ -38,7 +38,7 @@ class Appliance(object):
     def action(cls, func):
         """Decorator for marking the method as an action sent for the DiscoverApplianceRequest.
 
-        The action name is generated from the camelCased method name (e. g. turn_on -> turnOn).
+        The action name is generated from the camelCased method name (e.g. turn_on -> turnOn).
         The decorated method should take request as an argument, specific subclass of `Request` is
         passed for each action.
 
@@ -58,8 +58,7 @@ class Appliance(object):
 
         """
         last = getattr(func, 'ask_actions', [])
-        func.ask_actions = last + [get_action_string(func.__name__)]
-        cls.query(func)
+        func.ask_actions = last + [func.__name__]
         return func
 
     @classmethod
@@ -70,29 +69,7 @@ class Appliance(object):
         """
         def decorator(func):
             last = getattr(func, 'ask_actions', [])
-            func.ask_actions = last + map(get_action_string, args)
-            cls.query_for(*args)(func)
-            return func
-
-        return decorator
-
-    @classmethod
-    def query(cls, func):
-        """Decorator for marking the method to be routed to for its corresponding request.
-
-        The action name is generated from the camelCased method name (e. g. turn_on -> turnOn).
-        The decorated method should take request as an argument, specific subclass of `Request` is
-        passed for each action.
-        """
-        last = getattr(func, 'ask_requests', [])
-        func.ask_requests = last + [get_request_string(func.__name__)]
-        return func
-
-    @classmethod
-    def query_for(cls, *args):
-        def decorator(func):
-            last = getattr(func, 'ask_requests', [])
-            func.ask_requests = last + map(get_request_string, args)
+            func.ask_actions = last + list(args)
             return func
 
         return decorator
@@ -100,22 +77,26 @@ class Appliance(object):
     @classproperty
     @classmethod
     def actions(cls):
+        """dict(str: function): All actions the appliance supports and their corresponding (unbound)
+        method references. Action names are formatted for the DiscoverApplianceRequest.
+        """
         ret = {}
         for method in cls.__dict__.values():
             for action in getattr(method, 'ask_actions', []):
-                ret[action] = method
+                ret[get_action_string(action)] = method
 
         return ret
 
     @classproperty
     @classmethod
     def request_handlers(cls):
+        """dict(str: function): All requests the appliance supports (methods marked as actions)
+        and their corresponding (unbound) method references. For example action turn_on would be
+        formatted as TurnOnRequest.
+        """
         ret = {}
         for method in cls.__dict__.values():
-            for action in getattr(method, 'ask_requests', []):
-                ret[action] = method
+            for action in getattr(method, 'ask_actions', []):
+                ret[get_request_string(action)] = method
 
         return ret
-
-    class Details:
-        """Some docs"""

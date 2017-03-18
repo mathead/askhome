@@ -114,11 +114,11 @@ class DiscoverRequest(Request):
 
             serialized = {
                 'applianceId': appl_id,
-                'manufacturerName': get_detail('manufacturer'),
-                'modelName': get_detail('model'),
-                'version': get_detail('version'),
+                'manufacturerName': get_detail('manufacturer', 'Unknown manufacturer'),
+                'modelName': get_detail('model', 'Unknown model'),
+                'version': get_detail('version', 'v1'),
                 'friendlyName': get_detail('name'),
-                'friendlyDescription': get_detail('description'),
+                'friendlyDescription': get_detail('description', 'No description'),
                 'isReachable': get_detail('reachable', True),
                 'additionalApplianceDetails': get_detail('additional_details', {}),
                 'actions': sorted(appl.actions.keys()),  # sorted for easier testing

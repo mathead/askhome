@@ -22,11 +22,11 @@ def discover_response():
                     'additionalApplianceDetails': {},
                     'applianceId': '123',
                     'friendlyName': 'Kitchen Light',
-                    'friendlyDescription': '',
+                    'friendlyDescription': 'No description',
                     'isReachable': True,
-                    'manufacturerName': '',
-                    'modelName': '',
-                    'version': ''
+                    'manufacturerName': 'Unknown manufacturer',
+                    'modelName': 'Unknown model',
+                    'version': 'v1'
                 }
             ]
         }
@@ -215,7 +215,7 @@ def test_full_usage(discover_request):
         def set_target_temperature(self, request):
             raise TargetOfflineError
 
-        @Appliance.query
+        @Appliance.action
         def get_target_temperature(self, request):
             return request.response(27.6)
 
@@ -234,17 +234,18 @@ def test_full_usage(discover_request):
             'discoveredAppliances': [
                 {
                     'actions': [
+                        'getTargetTemperature',
                         'setTargetTemperature',
                         'turnOn'
                     ],
                     'additionalApplianceDetails': {},
                     'applianceId': 'light1',
                     'friendlyName': 'Kitchen Light',
-                    'friendlyDescription': '',
+                    'friendlyDescription': 'No description',
                     'isReachable': True,
-                    'manufacturerName': '',
-                    'modelName': '',
-                    'version': ''
+                    'manufacturerName': 'Unknown manufacturer',
+                    'modelName': 'Unknown model',
+                    'version': 'v1'
                 }
             ]
         }

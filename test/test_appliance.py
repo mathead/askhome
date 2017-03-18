@@ -42,18 +42,6 @@ def test_action_for_definition():
     }
 
 
-def test_query_definition():
-    class Light(Appliance):
-        @Appliance.query
-        def get_target_temperature(self, request):
-            return 42
-
-    l = Light()
-    assert len(l.actions) == 0
-    assert Light.request_handlers == {'GetTargetTemperatureRequest': Light.get_target_temperature.__func__}
-    assert l.request_handlers['GetTargetTemperatureRequest'](l, None) == 42
-
-
 def test_init():
     request = create_request({
         'header': {
