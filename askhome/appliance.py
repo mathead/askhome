@@ -11,8 +11,8 @@ class Appliance(object):
     """Appliance subclasses are used to describe what actions devices support.
 
     Methods of subclasses can be marked with decorators (like `@Appliance.action`) and are used to
-    generate Alexa DiscoverApplianceResponse. Alexa control and query requests are routed to the
-    corresponding decorated method.
+    generate the Alexa DiscoverApplianceResponse. Alexa control and query requests are then routed
+    to the corresponding decorated method.
 
     Appliance subclass can also contain a `Details` inner class for instance defaults during
     discovery (see `Smarthome.add_device` for possible attributes).

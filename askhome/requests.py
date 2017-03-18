@@ -4,6 +4,11 @@ from .utils import rstrip_word
 
 
 def create_request(data, context=None):
+    """Create a specific `Request` subclass according to the request type.
+
+    Each `Request` subclass has specific properties to access request data more easily and differing
+    `response` arguments for direct response creation.
+    """
     name = data['header']['name']
 
     # Return Request subtype for specific requests
@@ -21,7 +26,7 @@ def create_request(data, context=None):
         return ChangeTemperatureRequest(data, context)
 
     if name == 'GetTargetTemperatureRequest':
-        return GetTemperatureRequest(data, context)
+        return GetTargetTemperatureRequest(data, context)
 
     if name == 'GetTemperatureReadingRequest':
         return TemperatureReadingRequest(data, context)
@@ -36,6 +41,17 @@ def create_request(data, context=None):
 
 
 class Request(object):
+    """Base Request class for parsing Alexa request data.
+
+    Attributes:
+        data (dict): Raw event data from the lambda handler.
+        context (object): Context object from the lambda handler.
+        header (dict): Header of the Alexa request.
+        payload (dict): Payload of the Alexa request.
+        name (str): Request name from the `name` field in header.
+        access_token (str): OAuth token from the `accessToken` field in payload.
+
+    """
     def __init__(self, data, context=None):
         self.data = data
         self.context = context
@@ -47,17 +63,22 @@ class Request(object):
 
     @property
     def appliance_id(self):
+        """str: Identifier of the appliance from the appliance.applianceId of request payload."""
         if 'appliance' not in self.payload:
             return None
         return self.payload['appliance']['applianceId']
 
     @property
     def appliance_details(self):
+        """dict: Information that was sent for the DiscoverApplianceRequest in field
+        `appliance.additionalApplianceDetails`
+        """
         if 'appliance' not in self.payload:
             return None
         return self.payload['appliance']['additionalApplianceDetails']
 
     def response_header(self, name=None):
+        """Generate response header with copied values from the request and correct name."""
         if name is None:
             # Figure out response name - Control requests have confirmations instead of responses
             name = rstrip_word(self.name, 'Request')
@@ -73,6 +94,7 @@ class Request(object):
         return header
 
     def raw_response(self, payload=None, header=None):
+        """Compose response from raw payload and header dicts"""
         if payload is None:
             payload = {}
         if header is None:
@@ -81,9 +103,13 @@ class Request(object):
         return {'header': header, 'payload': payload}
 
     def response(self, *args, **kwargs):
+        """Return response with empty payload. Arguments and implementation of this method differ in
+        each Request subclass.
+        """
         return self.raw_response()
 
     def exception_response(self, exception):
+        """Create response from exception instance."""
         # Use exception class name as response name
         header = self.response_header(exception.name)
         header['namespace'] = exception.namespace
@@ -100,7 +126,13 @@ class Request(object):
 
 
 class DiscoverRequest(Request):
+    """Request class for Alexa DiscoverAppliancesRequest."""
     def response(self, smarthome):
+        """Generate DiscoverAppliancesResponse from appliances added to the passed Smarthome.
+
+        Details of each appliance are resolve in order of priority:
+        Smarthome.add_device kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
+        """
         discovered = []
         for appl_id, (appl, details) in smarthome.appliances.iteritems():
             # Helper function to get detail in hierarchy:
@@ -129,6 +161,7 @@ class DiscoverRequest(Request):
 
 
 class PercentageRequest(Request):
+    """Request class for Alexa Increment/Decrement/SetPercentageRequest."""
     @property
     def percentage(self):
         if 'percentageState' not in self.payload:
@@ -143,6 +176,7 @@ class PercentageRequest(Request):
 
 
 class TemperatureRequest(Request):
+    """Parent Request class temperature requests."""
     @property
     def temperature(self):
         if 'targetTemperature' not in self.payload:
@@ -157,7 +191,14 @@ class TemperatureRequest(Request):
 
 
 class ChangeTemperatureRequest(TemperatureRequest):
+    """Request class for Alexa Increment/Decrement/SetTargetTemperatureRequest."""
     def response(self, temperature, mode='AUTO', previous_temperature=None, previous_mode='AUTO'):
+        """Args:
+            temperature (float): Target temperature set by the device, in degrees Celsius.
+            mode (str): Temperature mode of device. Can be 'AUTO', 'COOL' or 'HEAT'.
+            previous_temperature (float): Previous target temperature in degrees Celsius.
+            previous_mode (str): Previous temperature mode.
+        """
         payload = {
             'targetTemperature': {
                 "value": temperature
@@ -181,9 +222,24 @@ class ChangeTemperatureRequest(TemperatureRequest):
         return self.raw_response(payload)
 
 
-class GetTemperatureRequest(TemperatureRequest):
+class GetTargetTemperatureRequest(TemperatureRequest):
+    """Request class for Alexa GetTargetTemperatureRequest."""
     def response(self, temperature=None, cooling_temperature=None, heating_temperature=None,
                  mode='AUTO', mode_name=None, timestamp=None):
+        """Args:
+            temperature (float): Target temperature set by the device, in degrees Celsius.
+            cooling_temperature (float): Target temperature (setpoint) for cooling, in degrees
+                Celsius, when a device has dual setpoints. Usually combined with
+                heatingTargetTemperature.
+            heating_temperature (float): Target temperature (setpoint) for heating, in degrees
+                Celsius, when a device has dual setpoints. Usually combined with
+                coolingTargetTemperature.
+            mode (str): Temperature mode of device. Can be one of 'AUTO', 'COOL', 'HEAT', 'ECO',
+                'OFF', 'CUSTOM'.
+            mode_name (str): Friendly name of the mode when it differs from the canonical name.
+                Required when mode is 'CUSTOM'.
+            timestamp (datetime|str): Time when the information was last retrieved.
+        """
         payload = {
             'temperatureMode': {'value': mode}
         }
@@ -204,7 +260,12 @@ class GetTemperatureRequest(TemperatureRequest):
 
 
 class TemperatureReadingRequest(TemperatureRequest):
+    """Request class for Alexa GetTemperatureReadingRequest."""
     def response(self, temperature, timestamp=None):
+        """Args:
+            temperature (float): Current temperature reading, in degrees Celsius.
+            timestamp (datetime|str): Time when the information was last retrieved.
+        """
         payload = {'temperatureReading': {'value': temperature}}
         # Add timestamp to payload if set
         if timestamp is not None:
@@ -213,11 +274,17 @@ class TemperatureReadingRequest(TemperatureRequest):
 
 
 class LockStateRequest(Request):
+    """Request class for Alexa Get/SetLockStateRequest."""
     @property
     def lock_state(self):
         return self.payload['lockState']
 
     def response(self, lock_state, timestamp=None):
+        """Args:
+            lock_state (str): Can be 'LOCKED' or 'UNLOCKED' for GetLockStateRequest, can be only
+                'LOCKED' for SetLockStateRequest (for security reasons).
+            timestamp (datetime|str): Time when the information was last retrieved.
+        """
         payload = {'lockState': lock_state}
         # Add timestamp to payload if set
         if timestamp is not None:
@@ -226,6 +293,7 @@ class LockStateRequest(Request):
 
 
 class HealthCheckRequest(Request):
+    """Request class for Alexa HealthCheckRequest."""
     def response(self, healthy, description):
         return self.raw_response({
             'isHealthy': healthy,
