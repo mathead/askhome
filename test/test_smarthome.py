@@ -45,7 +45,7 @@ def test_handle_discover(discover_request, discover_response, Light):
 def test_discover_decorator(discover_request, discover_response, Light):
     home = Smarthome()
 
-    @home.discover
+    @home.discover_handler
     def discover(request):
         home.add_appliance('123', Light, name='Kitchen Light')
         return request.response(home)
@@ -59,11 +59,11 @@ def test_get_device_decorator():
     class Light(Appliance):
         @Appliance.action
         def turn_on(self, request):
-            return request.raw_response({'foo': 'bar'})
+            return request.raw_response({'foo': self.id})
 
     home = Smarthome()
 
-    @home.get_appliance
+    @home.get_appliance_handler
     def get_appliance(request):
         return Light
 
@@ -91,7 +91,7 @@ def test_get_device_decorator():
             'namespace': 'Alexa.ConnectedHome.Control',
             'payloadVersion': '2'
         },
-        'payload': {'foo': 'bar'}
+        'payload': {'foo': 'light1'}
     }
 
 

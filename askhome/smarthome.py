@@ -1,5 +1,8 @@
+import json
+
 from .exceptions import SmartHomeException, UnsupportedTargetError, UnsupportedOperationError
 from .requests import create_request
+from . import logger
 
 
 class Smarthome(object):
@@ -9,19 +12,26 @@ class Smarthome(object):
         self._discover_func = None
         self._get_appliance_func = None
 
-    def discover(self, func):
+    def discover_handler(self, func):
         self._discover_func = func
         return func
 
-    def get_appliance(self, func):
+    def get_appliance_handler(self, func):
         self._get_appliance_func = func
         return func
 
-    # TODO: explicit kwargs
     def add_appliance(self, appl_id, appl_class, **details):
         self.appliances[appl_id] = (appl_class, details)
 
     def lambda_handler(self, data, context=None):
+        logger.debug(json.dumps(data, indent=2))
+
+        response = self._lambda_handler(data, context)
+        logger.debug(json.dumps(response, indent=2))
+        return response
+
+    def _lambda_handler(self, data, context=None):
+        # This method is here just so it can be wrapped for logging
         request = create_request(data, context)
 
         try:
@@ -36,14 +46,17 @@ class Smarthome(object):
                 # Appliance not found - return error response
                 if request.appliance_id not in self.appliances:
                     raise UnsupportedTargetError
-                appliance = self.appliances[request.appliance_id][0](request)
+                appliance_cls = self.appliances[request.appliance_id][0]
             else:
-                appliance = self._get_appliance_func(request)
+                appliance_cls = self._get_appliance_func(request)
 
             # Appliance doesn't handle requested operation - return error response
-            if request.name not in appliance.request_handlers:
+            if request.name not in appliance_cls.request_handlers:
                 raise UnsupportedOperationError
-            response = appliance.request_handlers[request.name](appliance, request)
+
+            # Finally instantiate the appliance and call the requested method
+            appliance = appliance_cls(request)
+            response = appliance_cls.request_handlers[request.name](appliance, request)
 
             if response is None:
                 return request.response()
