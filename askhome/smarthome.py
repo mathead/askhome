@@ -9,12 +9,13 @@ class Smarthome(object):
     """Holds information about all appliances and handles routing requests to appliance actions.
 
     Attributes:
-        appliances (dict of str - (Appliance, dict)): All registered appliances with details dict.
+        appliances (dict(str, (Appliance, dict))): All registered appliances with details dict.
         details (dict): Defaults for details of appliances during DiscoverAppliancesRequest.
 
     """
     def __init__(self, **details):
-        """Args:
+        """
+        Args:
             details (dict): Defaults for details of appliances during DiscoverAppliancesRequest.
                 See ``add_appliance`` method for possible values.
         """
@@ -22,22 +23,6 @@ class Smarthome(object):
         self.details = details
         self._discover_func = None
         self._get_appliance_func = None
-
-    def discover_handler(self, func):
-        """Decorator for a function that handles the DiscoverAppliancesRequest instead of the
-        ``Smarthome``. This can be useful for situations where querying the list of all devices
-        is too expensive to be done every request. Should be used in conjunction with the
-        ``get_appliance_handler`` decorator.
-        """
-        self._discover_func = func
-        return func
-
-    def get_appliance_handler(self, func):
-        """Decorator for a function that handles getting the ``Appliance`` subclass instead of the
-        ``Smarthome``. Should be used in conjunction with the ``get_appliance_handler`` decorator.
-        """
-        self._get_appliance_func = func
-        return func
 
     def add_appliance(self, appl_id, appl_class, name=None, description=None,
                       additional_details=None, model=None, version=None, manufacturer=None,
@@ -59,7 +44,7 @@ class Smarthome(object):
             description (str): Human-readable description of the device. This value cannot exceed
                 128 characters. The description should contain a description of how the device is
                 connected. For example, "WiFi Thermostat connected via Wink".
-            additional_details (dict of str: str): Some instance specific details can be saved here.
+            additional_details (dict(str, str)): Some instance specific details can be saved here.
                 This field is sent back every time a request on that appliance is made. Cannot
                 exceed 5000 bytes.
             model (str): Device model name. Cannot exceed 128 characters.
@@ -91,6 +76,22 @@ class Smarthome(object):
             'actions': sorted(appl_class.actions.keys()),  # sorted for easier testing
         }
         self.appliances[appl_id] = (appl_class, details)
+
+    def discover_handler(self, func):
+        """Decorator for a function that handles the DiscoverAppliancesRequest instead of the
+        ``Smarthome``. This can be useful for situations where querying the list of all devices
+        is too expensive to be done every request. Should be used in conjunction with the
+        ``get_appliance_handler`` decorator.
+        """
+        self._discover_func = func
+        return func
+
+    def get_appliance_handler(self, func):
+        """Decorator for a function that handles getting the ``Appliance`` subclass instead of the
+        ``Smarthome``. Should be used in conjunction with the ``get_appliance_handler`` decorator.
+        """
+        self._get_appliance_func = func
+        return func
 
     def lambda_handler(self, data, context=None):
         """Main entry point for handling requests. Pass the AWS Lambda events here."""

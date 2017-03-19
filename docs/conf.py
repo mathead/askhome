@@ -45,7 +45,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'askhome'
+project = u'Askhome'
 copyright = u'2017, Matěj Hlaváček'
 author = u'Matěj Hlaváček'
 
@@ -153,4 +153,19 @@ texinfo_documents = [
 ]
 
 
+# Custom settings
 
+# autoclass_content = 'both'
+autodoc_member_order = 'bysource'
+
+html_sidebars = {
+    '**': ['about.html', 'globaltoc.html', 'relations.html', 'searchbox.html'],
+}
+html_theme_options = {
+    # 'logo': 'logo.png',
+    # 'logo_name': True,
+    'description': 'Alexa Smart Home Skills with Python',
+    'github_user': 'mathead',
+    'github_repo': 'askhome',
+    'github_type': 'star',
+}

@@ -156,7 +156,7 @@ class PercentageRequest(Request):
 
 
 class TemperatureRequest(Request):
-    """Parent Request class temperature requests."""
+    """Parent Request class for temperature requests."""
     @property
     def temperature(self):
         if 'targetTemperature' not in self.payload:

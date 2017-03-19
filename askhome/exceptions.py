@@ -134,6 +134,7 @@ class UnableToGetValueError(AskhomeException):
         """
         Args:
             error_code (str): Possible error codes are:
+
                 * DEVICE_AJAR: Cannot get the specified state because the door is open.
                 * DEVICE_BUSY: The device is busy
                 * DEVICE_JAMMED: The device is jammed.
@@ -159,6 +160,7 @@ class UnableToSetValueError(AskhomeException):
         """
         Args:
             error_code (str): Possible error codes are:
+
                 * DEVICE_AJAR: Cannot get the specified state because the door is open.
                 * DEVICE_BUSY: The device is busy
                 * DEVICE_JAMMED: The device is jammed.

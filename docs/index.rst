@@ -1,21 +1,43 @@
-.. askhome documentation master file, created by
-    sphinx-quickstart on Sun Mar 19 00:56:14 2017.
-    You can adapt this file completely to your liking, but it should at least
-    contain the root `toctree` directive.
+Welcome to Askhome!
+===================
 
-Welcome to askhome's documentation!
-===================================
+Askhome wraps the Smart Home Skill API for Amazon Echo and removes all that ugly boilerplate.
+
+Basic skill in askhome looks like this::
+
+    from askhome import Smarthome, Appliance
+
+    class Star(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            ... # Let there be light
+
+    home = Smarthome()
+    home.add_device('star1', Star, name='Sun')
+
+    handler = home.lambda_handler
+
+Features
+--------
+
+a
+
+User Guide
+----------
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contents:
 
-    API
+    quickstart
+    advanced
 
+API Documentation
+-----------------
 
-Indices and tables
-==================
+If you are looking for information on a specific function, class or method, this part of the
+documentation is for you.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+    :maxdepth: 2
+
+    api

@@ -1,15 +1,17 @@
-import functools
-
 from .utils import get_action_string, get_request_string
 
 
 class _classproperty(property):
     """Utility class for @property fields on the class."""
-    def __init__(self, getter):
-        self.getter = getter
+    def __init__(self, func):
+        self.func = func
+        self.__doc__ = func.__doc__
 
     def __get__(self, instance, owner):
-        return self.getter(owner)
+        # This makes docstrings work
+        if owner is Appliance:
+            return self
+        return self.func(owner)
 
 
 class Appliance(object):
@@ -81,7 +83,7 @@ class Appliance(object):
 
     @_classproperty
     def actions(cls):
-        """dict of str: function: All actions the appliance supports and their corresponding (unbound)
+        """dict(str, function): All actions the appliance supports and their corresponding (unbound)
         method references. Action names are formatted for the DiscoverAppliancesRequest.
         """
         ret = {}
@@ -93,7 +95,7 @@ class Appliance(object):
 
     @_classproperty
     def request_handlers(cls):
-        """dict of str: function: All requests the appliance supports (methods marked as actions)
+        """dict(str, function): All requests the appliance supports (methods marked as actions)
         and their corresponding (unbound) method references. For example action turn_on would be
         formatted as TurnOnRequest.
         """
