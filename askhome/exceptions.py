@@ -1,13 +1,14 @@
 class AskhomeException(Exception):
     """Base askhome exception from which all inherit.
 
-    These exceptions can be raised in `Appliance` actions or manually passed to
-    `Request.exception_response` to create an error response.
+    These exceptions can be raised in ``Appliance`` actions or manually passed to
+    ``Request.exception_response`` to create an error response.
     """
     namespace = 'Alexa.ConnectedHome.Control'
     
     def __init__(self, *args, **kwargs):
-        """Args:
+        """
+        Args:
             name (str): Custom error name in header of generated response
             payload (dict): Custom payload of generated response
         """
@@ -130,7 +131,8 @@ class UnableToGetValueError(AskhomeException):
     namespace = 'Alexa.ConnectedHome.Query'
 
     def __init__(self, error_code, error_description=None, *args, **kwargs):
-        """Args:
+        """
+        Args:
             error_code (str): Possible error codes are:
                 * DEVICE_AJAR: Cannot get the specified state because the door is open.
                 * DEVICE_BUSY: The device is busy
@@ -154,7 +156,8 @@ class UnableToSetValueError(AskhomeException):
     error codes appropriate for the target device.
     """
     def __init__(self, error_code, error_description=None, *args, **kwargs):
-        """Args:
+        """
+        Args:
             error_code (str): Possible error codes are:
                 * DEVICE_AJAR: Cannot get the specified state because the door is open.
                 * DEVICE_BUSY: The device is busy

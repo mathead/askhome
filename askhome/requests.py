@@ -4,10 +4,10 @@ from .utils import rstrip_word
 
 
 def create_request(data, context=None):
-    """Create a specific `Request` subclass according to the request type.
+    """Create a specific ``Request`` subclass according to the request type.
 
-    Each `Request` subclass has specific properties to access request data more easily and differing
-    `response` arguments for direct response creation.
+    Each ``Request`` subclass has specific properties to access request data more easily and differing
+    ``response`` arguments for direct response creation.
     """
     name = data['header']['name']
 
@@ -48,8 +48,8 @@ class Request(object):
         context (object): Context object from the lambda handler.
         header (dict): Header of the Alexa request.
         payload (dict): Payload of the Alexa request.
-        name (str): Request name from the `name` field in header.
-        access_token (str): OAuth token from the `accessToken` field in payload.
+        name (str): Request name from the ``name`` field in header.
+        access_token (str): OAuth token from the ``accessToken`` field in payload.
 
     """
     def __init__(self, data, context=None):
@@ -71,7 +71,7 @@ class Request(object):
     @property
     def appliance_details(self):
         """dict: Information that was sent for the DiscoverApplianceRequest in field
-        `appliance.additionalApplianceDetails`
+        ``appliance.additionalApplianceDetails``
         """
         if 'appliance' not in self.payload:
             return None
@@ -128,10 +128,10 @@ class Request(object):
 class DiscoverRequest(Request):
     """Request class for Alexa DiscoverAppliancesRequest."""
     def response(self, smarthome):
-        """Generate DiscoverAppliancesResponse from appliances added to the passed `Smarthome`.
+        """Generate DiscoverAppliancesResponse from appliances added to the passed ``Smarthome``.
 
         Details of each appliance are resolved in order of priority:
-        `Smarthome.add_device` kwargs -> `Appliance.Details` -> `Smarthome.__init__` kwargs
+        ``Smarthome.add_device`` kwargs -> ``Appliance.Details`` -> ``Smarthome.__init__`` kwargs
         """
         discovered = []
         for appl, details in smarthome.appliances.values():
@@ -173,7 +173,8 @@ class TemperatureRequest(Request):
 class ChangeTemperatureRequest(TemperatureRequest):
     """Request class for Alexa Increment/Decrement/SetTargetTemperatureRequest."""
     def response(self, temperature, mode='AUTO', previous_temperature=None, previous_mode='AUTO'):
-        """Args:
+        """
+        Args:
             temperature (float): Target temperature set by the device, in degrees Celsius.
             mode (str): Temperature mode of device. Can be 'AUTO', 'COOL' or 'HEAT'.
             previous_temperature (float): Previous target temperature in degrees Celsius.
@@ -206,7 +207,8 @@ class GetTargetTemperatureRequest(TemperatureRequest):
     """Request class for Alexa GetTargetTemperatureRequest."""
     def response(self, temperature=None, cooling_temperature=None, heating_temperature=None,
                  mode='AUTO', mode_name=None, timestamp=None):
-        """Args:
+        """
+        Args:
             temperature (float): Target temperature set by the device, in degrees Celsius.
             cooling_temperature (float): Target temperature (setpoint) for cooling, in degrees
                 Celsius, when a device has dual setpoints. Usually combined with
@@ -219,6 +221,7 @@ class GetTargetTemperatureRequest(TemperatureRequest):
             mode_name (str): Friendly name of the mode when it differs from the canonical name.
                 Required when mode is 'CUSTOM'.
             timestamp (datetime|str): Time when the information was last retrieved.
+
         """
         payload = {
             'temperatureMode': {'value': mode}
@@ -242,7 +245,8 @@ class GetTargetTemperatureRequest(TemperatureRequest):
 class TemperatureReadingRequest(TemperatureRequest):
     """Request class for Alexa GetTemperatureReadingRequest."""
     def response(self, temperature, timestamp=None):
-        """Args:
+        """
+        Args:
             temperature (float): Current temperature reading, in degrees Celsius.
             timestamp (datetime|str): Time when the information was last retrieved.
         """
@@ -260,7 +264,8 @@ class LockStateRequest(Request):
         return self.payload['lockState']
 
     def response(self, lock_state, timestamp=None):
-        """Args:
+        """
+        Args:
             lock_state (str): Can be 'LOCKED' or 'UNLOCKED' for GetLockStateRequest, can be only
                 'LOCKED' for SetLockStateRequest (for security reasons).
             timestamp (datetime|str): Time when the information was last retrieved.

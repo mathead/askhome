@@ -1,21 +1,26 @@
+import functools
+
 from .utils import get_action_string, get_request_string
 
 
-class classproperty(property):
+class _classproperty(property):
     """Utility class for @property fields on the class."""
-    def __get__(self, cls, owner):
-        return self.fget.__get__(None, owner)()
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, instance, owner):
+        return self.getter(owner)
 
 
 class Appliance(object):
     """Appliance subclasses are used to describe what actions devices support.
 
-    Methods of subclasses can be marked with decorators (like `@Appliance.action`) and are used to
+    Methods of subclasses can be marked with decorators (like ``@Appliance.action``) and are used to
     generate the Alexa DiscoverApplianceResponse. Alexa control and query requests are then routed
     to the corresponding decorated method.
 
-    Appliance subclass can also contain a `Details` inner class for instance defaults during
-    discovery (see `Smarthome.add_device` for possible attributes).
+    Appliance subclass can also contain a ``Details`` inner class for instance defaults during
+    discovery (see ``Smarthome.add_device`` for possible attributes).
 
     Attributes:
         request (Request): Currently processed request.
@@ -39,10 +44,10 @@ class Appliance(object):
         """Decorator for marking the method as an action sent for the DiscoverAppliancesRequest.
 
         The action name is generated from the camelCased method name (e.g. turn_on -> turnOn).
-        The decorated method should take request as an argument, specific subclass of `Request` is
+        The decorated method should take request as an argument, specific subclass of ``Request`` is
         passed for each action.
 
-        Possible action methods and their corresponding `Request` types passed are:
+        Possible action methods and their corresponding ``Request`` types passed are:
             * turn_on(Request)
             * turn_off(Request)
             * set_percentage(PercentageRequest)
@@ -63,7 +68,7 @@ class Appliance(object):
 
     @classmethod
     def action_for(cls, *args):
-        """Decorator similar to the `action` decorator, except it doesn't generate the action name
+        """Decorator similar to the ``action`` decorator, except it doesn't generate the action name
         from the method name. All action names that should lead to the decorated method are passed
         as arguments to the decorator.
         """
@@ -74,10 +79,9 @@ class Appliance(object):
 
         return decorator
 
-    @classproperty
-    @classmethod
+    @_classproperty
     def actions(cls):
-        """dict(str: function): All actions the appliance supports and their corresponding (unbound)
+        """dict of str: function: All actions the appliance supports and their corresponding (unbound)
         method references. Action names are formatted for the DiscoverAppliancesRequest.
         """
         ret = {}
@@ -87,10 +91,9 @@ class Appliance(object):
 
         return ret
 
-    @classproperty
-    @classmethod
+    @_classproperty
     def request_handlers(cls):
-        """dict(str: function): All requests the appliance supports (methods marked as actions)
+        """dict of str: function: All requests the appliance supports (methods marked as actions)
         and their corresponding (unbound) method references. For example action turn_on would be
         formatted as TurnOnRequest.
         """
