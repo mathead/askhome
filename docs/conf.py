@@ -162,10 +162,10 @@ html_sidebars = {
     '**': ['about.html', 'globaltoc.html', 'relations.html', 'searchbox.html'],
 }
 html_theme_options = {
-    # 'logo': 'logo.png',
-    # 'logo_name': True,
+    'logo': 'logo.png',
     'description': 'Alexa Smart Home Skills with Python',
     'github_user': 'mathead',
     'github_repo': 'askhome',
     'github_type': 'star',
+    'show_related': True,
 }

@@ -1,2 +1,6 @@
 Advanced Usage
 ==============
+
+Smarthome handlers
+------------------
+
