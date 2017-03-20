@@ -1,4 +1,5 @@
-# Askhome - Alexa Smart Home Skills with Python
+![Logo](docs/_static/logo.png)
+## Askhome - Alexa Smart Home Skills with Python
 [![Build Status](https://travis-ci.org/mathead/askhome.svg?branch=master)](https://travis-ci.org/mathead/askhome)
 [![codecov](https://codecov.io/gh/mathead/askhome/branch/master/graph/badge.svg)](https://codecov.io/gh/mathead/askhome)
 
@@ -19,4 +20,4 @@ home.add_device('star1', Star, name='Sun')
 handler = home.lambda_handler
 ```
 
-Docs are coming soon, hang tight!
+Check out the docs at http://askhome.rtfd.io
