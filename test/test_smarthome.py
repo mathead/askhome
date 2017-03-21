@@ -1,4 +1,4 @@
-import pytest
+import pytest, askhome
 
 from askhome import Smarthome, Appliance
 from askhome.exceptions import TargetOfflineError
@@ -92,6 +92,52 @@ def test_get_device_decorator():
             'payloadVersion': '2'
         },
         'payload': {'foo': 'light1'}
+    }
+
+
+def test_healthcheck_decorator():
+    home = Smarthome()
+
+    healthcheck_request = {
+        'header': {
+            'messageId': '243550dc-5f95-4ae4-ad43-4e1e7cb037fd',
+            'name': 'HealthCheckRequest',
+            'namespace': 'Alexa.ConnectedHome.System',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'initiationTimestamp': '1435302567000'
+        }
+    }
+
+    assert home.lambda_handler(healthcheck_request) == {
+        "header": {
+            "messageId": "243550dc-5f95-4ae4-ad43-4e1e7cb037fd",
+            "name": "HealthCheckResponse",
+            "namespace": "Alexa.ConnectedHome.System",
+            "payloadVersion": "2"
+        },
+        "payload": {
+            "description": "Everything's OK",
+            "isHealthy": True
+        }
+    }
+
+    @home.healthcheck_handler
+    def healthcheck(request):
+        return request.response(False, "This is bad")
+
+    assert home.lambda_handler(healthcheck_request) == {
+        "header": {
+            "messageId": "243550dc-5f95-4ae4-ad43-4e1e7cb037fd",
+            "name": "HealthCheckResponse",
+            "namespace": "Alexa.ConnectedHome.System",
+            "payloadVersion": "2"
+        },
+        "payload": {
+            "description": "This is bad",
+            "isHealthy": False
+        }
     }
 
 

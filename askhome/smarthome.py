@@ -23,6 +23,7 @@ class Smarthome(object):
         self.details = details
         self._discover_func = None
         self._get_appliance_func = None
+        self._healthcheck_func = None
 
     def add_appliance(self, appl_id, appl_class, name=None, description=None,
                       additional_details=None, model=None, version=None, manufacturer=None,
@@ -93,6 +94,13 @@ class Smarthome(object):
         self._get_appliance_func = func
         return func
 
+    def healthcheck_handler(self, func):
+        """Decorator for a function that handles ``HealthCheckRequest``. Behaves the same as a
+        regular action method.
+        """
+        self._healthcheck_func = func
+        return func
+
     def lambda_handler(self, data, context=None):
         """Main entry point for handling requests. Pass the AWS Lambda events here."""
         logger.debug(json.dumps(data, indent=2))
@@ -112,6 +120,12 @@ class Smarthome(object):
                 if self._discover_func is None:
                     return request.response(self)
                 return self._discover_func(request)
+
+            # Handle health check
+            if request.name == "HealthCheckRequest":
+                if self._healthcheck_func is None:
+                    return request.response(healthy=True, description="Everything's OK")
+                return self._healthcheck_func(request)
 
             # Find the according appliance
             if self._get_appliance_func is None:
@@ -135,4 +149,6 @@ class Smarthome(object):
             return response
 
         except AskhomeException as exception:
-            return request.exception_response(exception)
+            response = request.exception_response(exception)
+            logger.info('Exception raised: %r, %s', exception, response)
+            return response

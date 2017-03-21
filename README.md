@@ -15,9 +15,9 @@ class Star(Appliance):
         ... # Let there be light
         
 home = Smarthome()
-home.add_device('star1', Star, name='Sun')
+home.add_appliance('star1', Star, name='Sun')
 
 handler = home.lambda_handler
 ```
 
-Check out the docs at http://askhome.rtfd.io
+Check out the docs at http://askhome.rtfd.io!

@@ -50,18 +50,18 @@ class Appliance(object):
         passed for each action.
 
         Possible action methods and their corresponding ``Request`` types passed are:
-            * turn_on(Request)
-            * turn_off(Request)
-            * set_percentage(PercentageRequest)
-            * increment_percentage(PercentageRequest)
-            * decrement_percentage(PercentageRequest)
-            * set_target_temperature(ChangeTemperatureRequest)
-            * increment_target_temperature(ChangeTemperatureRequest)
-            * decrement_target_temperature(ChangeTemperatureRequest)
-            * get_target_temperature(GetTemperatureRequest)
-            * get_temperature_reading(TemperatureReadingRequest)
-            * set_lock_state(LockStateRequest)
-            * get_lock_state(LockStateRequest)
+            * turn_on(:class:`askhome.requests.Request`)
+            * turn_off(:class:`askhome.requests.Request`)
+            * set_percentage(:class:`askhome.requests.PercentageRequest`)
+            * increment_percentage(:class:`askhome.requests.PercentageRequest`)
+            * decrement_percentage(:class:`askhome.requests.PercentageRequest`)
+            * set_target_temperature(:class:`askhome.requests.ChangeTemperatureRequest`)
+            * increment_target_temperature(:class:`askhome.requests.ChangeTemperatureRequest`)
+            * decrement_target_temperature(:class:`askhome.requests.ChangeTemperatureRequest`)
+            * get_target_temperature(:class:`askhome.requests.GetTargetTemperatureRequest`)
+            * get_temperature_reading(:class:`askhome.requests.TemperatureReadingRequest`)
+            * set_lock_state(:class:`askhome.requests.LockStateRequest`)
+            * get_lock_state(:class:`askhome.requests.LockStateRequest`)
 
         """
         last = getattr(func, 'ask_actions', [])

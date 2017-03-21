@@ -1,6 +1,16 @@
+.. _advanced-usage:
+
 Advanced Usage
 ==============
 
-Smarthome handlers
+Reusing Appliance Details
+-------------------------
+
+Smarthome Handlers
 ------------------
 
+User Data
+---------
+
+Logging
+-------

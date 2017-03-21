@@ -155,8 +155,8 @@ class PercentageRequest(Request):
         return self.payload['deltaPercentage']['value']
 
 
-class TemperatureRequest(Request):
-    """Parent Request class for temperature requests."""
+class ChangeTemperatureRequest(Request):
+    """Request class for Alexa Increment/Decrement/SetTargetTemperatureRequest."""
     @property
     def temperature(self):
         if 'targetTemperature' not in self.payload:
@@ -169,9 +169,6 @@ class TemperatureRequest(Request):
             return None
         return self.payload['deltaTemperature']['value']
 
-
-class ChangeTemperatureRequest(TemperatureRequest):
-    """Request class for Alexa Increment/Decrement/SetTargetTemperatureRequest."""
     def response(self, temperature, mode='AUTO', previous_temperature=None, previous_mode='AUTO'):
         """
         Args:
@@ -203,7 +200,7 @@ class ChangeTemperatureRequest(TemperatureRequest):
         return self.raw_response(payload)
 
 
-class GetTargetTemperatureRequest(TemperatureRequest):
+class GetTargetTemperatureRequest(Request):
     """Request class for Alexa GetTargetTemperatureRequest."""
     def response(self, temperature=None, cooling_temperature=None, heating_temperature=None,
                  mode='AUTO', mode_name=None, timestamp=None):
@@ -242,7 +239,7 @@ class GetTargetTemperatureRequest(TemperatureRequest):
         return self.raw_response(payload)
 
 
-class TemperatureReadingRequest(TemperatureRequest):
+class TemperatureReadingRequest(Request):
     """Request class for Alexa GetTemperatureReadingRequest."""
     def response(self, temperature, timestamp=None):
         """
