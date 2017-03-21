@@ -4,6 +4,8 @@ Quick Start
 In here you'll find a fast introduction to askhome and show you how to get a simple Smart Home Skill
 up and running.
 
+.. _installation:
+
 Installation
 ------------
 
@@ -57,10 +59,10 @@ We've added two lights with some additional info. For all details you can set, c
 `DiscoverAppliancesResponse`_
 documentation.
 
-All that's left to do is make a handler accessible for our AWS Lambda instance (more on that in
+All that's left to do is expose a handler for our AWS Lambda instance (more on that in
 :ref:`deployment <deployment>`)::
 
-    handler = home.lambda_handler
+    lambda_handler = home.lambda_handler
 
 And that's it! We've got a fully functioning Smart Home Skill that controls our lights. It can be
 initialized with:
@@ -188,9 +190,58 @@ All possible exceptions can be found :mod:`here <askhome.exceptions>` or at the 
 Deployment
 ----------
 
-Unlike the Custom Skills, Smart Home Skills have to be hosted on AWS Lambda instances.
+Unlike the Custom Skills, Smart Home Skills have to be hosted on AWS Lambda instances. To create a
+skill and deploy it to Lambda, follow the `official tutorial`_. When it comes to uploading your
+code, you have to package your libraries with it. You can do that with a local pip
+:ref:`installation <installation>` and then uploading a zip of your project with all its
+dependencies included.
 
-...
+Deploying with Zappa
+^^^^^^^^^^^^^^^^^^^^
+
+`Zappa`_ is an awesome tool to deploy WSGI apps to Lambda. Smart Home Skills are not using the WSGI
+interface, but we can still use Zappa to automate our deployments. It also comes with advantages
+like precompiled python packages (such as pyOpenSSL) which would otherwise have to be compiled on
+AWS machines.
+
+To use it, first create a `virtualenv`_ for your project:
+
+.. code-block:: console
+
+    $ virtualenv .venv
+    $ source .venv/Scripts/activate
+
+Then install the required packages:
+
+.. code-block:: console
+
+    $ pip install Zappa askhome
+
+Create a ``zappa_settings.yml`` configuration file for Zappa:
+
+.. code-block:: yaml
+
+    dev:
+      s3_bucket: smart-home-skill-dev-deploy
+      lambda_handler: main.handler # name of your file and exposed handler
+      aws_region: us-east-1 # region has to match your Echo version
+      timeout_seconds: 10
+      memory_size: 128
+      keep_warm: false
+      touch: false # keep Zappa from sending WSGI requests to your skill
+
+Finally, let Zappa do its work:
+
+.. code-block:: console
+
+    $ zappa deploy
+
+That should create a Lambda function, but you still need to manually add the trigger and link the
+function to your skill as described in the `official tutorial`_. After that your Echo should respond
+to your commands!
+
+
+------------
 
 Next, you can go to the official `Smart Home Skill API`_ documentation for detailed request
 information or continue to :ref:`advanced-usage`.
@@ -200,4 +251,7 @@ information or continue to :ref:`advanced-usage`.
 .. _DiscoverAppliancesResponse: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference#discoverappliancesresponse
 .. _Smart Home Skill API: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference
 .. _official documentation: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference#message-payload
+.. _official tutorial: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/steps-to-create-a-smart-home-skill
 .. _error messages: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference#error-messages
+.. _Zappa: https://github.com/Miserlou/Zappa
+.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
