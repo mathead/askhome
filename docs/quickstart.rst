@@ -15,13 +15,13 @@ Install askhome with pip:
 
 .. code-block:: console
 
-    $ pip install git+git://github.com/mathead/askhome.git@master
+    $ pip install askhome
 
 If you are deploying to AWS Lambda by uploading zips, install askhome to your directory with:
 
 .. code-block:: console
 
-    $ pip install git+git://github.com/mathead/askhome.git@master -t /path/to/project-dir
+    $ pip install askhome -t /path/to/project-dir
 
 More on :ref:`deployment <deployment>` later.
 

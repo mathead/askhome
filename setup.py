@@ -10,7 +10,7 @@ setup(
     url='https://github.com/mathead/askhome',
     download_url='https://github.com/mathead/askhome/archive/0.1.tar.gz',
     keywords='',
-    long_description="Alexa Skills Kit library for working with Smart Home Skill API",
+    description='Alexa Skills Kit library for working with Smart Home Skill API',
     install_requires=[
         'inflection'
     ],
