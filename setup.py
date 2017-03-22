@@ -1,10 +1,15 @@
+# -*- coding: utf-8 -*-
 from distutils.core import setup
 
 setup(
     name='askhome',
-    version='0.1',
     packages=['askhome'],
-    license='MIT',
+    version='0.1',
+    author=u'Matěj Hlaváček',
+    author_email='hlavacek.matej@gmail.com',
+    url='https://github.com/mathead/askhome',
+    download_url='https://github.com/mathead/askhome/archive/0.1.tar.gz',
+    keywords='',
     long_description="Alexa Skills Kit library for working with Smart Home Skill API",
     install_requires=[
         'inflection'
