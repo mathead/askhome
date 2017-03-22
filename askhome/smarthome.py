@@ -24,6 +24,7 @@ class Smarthome(object):
         self._discover_func = None
         self._get_appliance_func = None
         self._healthcheck_func = None
+        self._prepare_request_func = None
 
     def add_appliance(self, appl_id, appl_class, name=None, description=None,
                       additional_details=None, model=None, version=None, manufacturer=None,
@@ -32,7 +33,7 @@ class Smarthome(object):
 
         The keyword arguments can be also defined in ``Smarthome.__init__`` and ``Details`` inner
         class in the appliance. Resulting value is resolved in order of priority:
-        ``Smarthome.add_device`` kwargs -> ``Appliance.Details`` -> ``Smarthome.__init__`` kwargs
+        ``Smarthome.add_appliance`` kwargs -> ``Appliance.Details`` -> ``Smarthome.__init__`` kwargs
 
         Args:
             appl_id (str): Unique identifier of the appliance, needs to be consistent across
@@ -57,7 +58,7 @@ class Smarthome(object):
         # The kwargs are explicitly named for better autocomplete
 
         # Helper function to get detail in hierarchy:
-        # Smarthome.add_device kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
+        # Smarthome.add_appliance kwargs -> Appliance.Details -> Smarthome.__init__ kwargs
         def get_detail(detail_name, arg, default=''):
             if arg is not None:
                 return arg
@@ -77,6 +78,13 @@ class Smarthome(object):
             'actions': sorted(appl_class.actions.keys()),  # sorted for easier testing
         }
         self.appliances[appl_id] = (appl_class, details)
+
+    def prepare_request_handler(self, func):
+        """Decorator for a function that gets called before every request. Useful to modify the
+        request processed, for instance add data to ``Request.custom_data``
+        """
+        self._prepare_request_func = func
+        return func
 
     def discover_handler(self, func):
         """Decorator for a function that handles the DiscoverAppliancesRequest instead of the
@@ -112,9 +120,14 @@ class Smarthome(object):
 
     def _lambda_handler(self, data, context=None):
         # This method is here just so it can be wrapped for logging
+
         request = create_request(data, context)
 
         try:
+            # Handle prepare request
+            if self._prepare_request_func is not None:
+                self._prepare_request_func(request)
+
             # Handle discover request
             if request.name == 'DiscoverAppliancesRequest':
                 if self._discover_func is None:

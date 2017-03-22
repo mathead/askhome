@@ -22,7 +22,7 @@ class Appliance(object):
     to the corresponding decorated method.
 
     Appliance subclass can also contain a ``Details`` inner class for instance defaults during
-    discovery (see ``Smarthome.add_device`` for possible attributes).
+    discovery (see ``Smarthome.add_appliance`` for possible attributes).
 
     Attributes:
         request (Request): Currently processed request.
@@ -105,3 +105,8 @@ class Appliance(object):
                 ret[get_request_string(action)] = method
 
         return ret
+
+    class Details:
+        """Inner class in ``Appliance`` subclasses provides default values so that they don't
+        have to be repeated in ``Smarthome.add_appliance``.
+        """

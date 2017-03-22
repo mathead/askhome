@@ -1,3 +1,5 @@
+.. _quick-start:
+
 Quick Start
 ===========
 
@@ -223,7 +225,7 @@ Create a ``zappa_settings.yml`` configuration file for Zappa:
 
     dev:
       s3_bucket: smart-home-skill-dev-deploy
-      lambda_handler: main.handler # name of your file and exposed handler
+      lambda_handler: main.lambda_handler # name of your file and exposed handler
       aws_region: us-east-1 # region has to match your Echo version
       timeout_seconds: 10
       memory_size: 128

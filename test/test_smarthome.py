@@ -42,6 +42,45 @@ def test_handle_discover(discover_request, discover_response, Light):
     assert response == discover_response
 
 
+def test_prepare_request_decorator():
+    class Light(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            return request.raw_response({'foo': request.custom_data})
+
+    home = Smarthome()
+    home.add_appliance('light1', Light)
+
+    @home.prepare_request_handler
+    def prepare_request(request):
+        request.custom_data = 'bar'
+
+    request = {
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnRequest',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {
+            'accessToken': '[OAuth token here]',
+            'appliance': {
+                'additionalApplianceDetails': {},
+                'applianceId': 'light1'
+            }
+        }
+    }
+    assert home.lambda_handler(request) == {
+        'header': {
+            'messageId': '01ebf625-0b89-4c4d-b3aa-32340e894688',
+            'name': 'TurnOnConfirmation',
+            'namespace': 'Alexa.ConnectedHome.Control',
+            'payloadVersion': '2'
+        },
+        'payload': {'foo': 'bar'}
+    }
+
+
 def test_discover_decorator(discover_request, discover_response, Light):
     home = Smarthome()
 
@@ -55,7 +94,7 @@ def test_discover_decorator(discover_request, discover_response, Light):
     assert response == discover_response
 
 
-def test_get_device_decorator():
+def test_get_appliance_decorator():
     class Light(Appliance):
         @Appliance.action
         def turn_on(self, request):

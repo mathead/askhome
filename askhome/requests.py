@@ -50,6 +50,8 @@ class Request(object):
         payload (dict): Payload of the Alexa request.
         name (str): Request name from the ``name`` field in header.
         access_token (str): OAuth token from the ``accessToken`` field in payload.
+        custom_data (Any): Attribute for saving custom data through
+            ``Smarthome.prepare_request_handler``
 
     """
     def __init__(self, data, context=None):
@@ -60,6 +62,7 @@ class Request(object):
         self.payload = data['payload']
         self.name = self.header['name']
         self.access_token = self.payload.get('accessToken', None)
+        self.custom_data = None
 
     @property
     def appliance_id(self):
@@ -131,7 +134,7 @@ class DiscoverRequest(Request):
         """Generate DiscoverAppliancesResponse from appliances added to the passed ``Smarthome``.
 
         Details of each appliance are resolved in order of priority:
-        ``Smarthome.add_device`` kwargs -> ``Appliance.Details`` -> ``Smarthome.__init__`` kwargs
+        ``Smarthome.add_appliance`` kwargs -> ``Appliance.Details`` -> ``Smarthome.__init__`` kwargs
         """
         discovered = []
         for appl, details in smarthome.appliances.values():
