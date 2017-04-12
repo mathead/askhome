@@ -75,7 +75,15 @@ def test_inherited_actions():
         def turn_off(self, request):
             return 2
 
+    l1 = Light()
+    l2 = Light2()
     assert Light2.actions == {
         'turnOn': Light2.turn_on.__func__,
         'turnOff': Light2.turn_off.__func__,
     }
+    assert l1.actions['turnOn'](l1, None) == 1
+    assert l2.actions['turnOff'](l2, None) == 2
+
+
+def test_appliance_docstrings():
+    assert isinstance(Appliance.actions.__doc__, str)
