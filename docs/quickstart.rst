@@ -176,7 +176,7 @@ If the user asked an invalid request or something goes wrong during the action e
 Home API offers plenty of possible error responses. To respond with an error, simply raise one of
 askhome's exceptions, like this::
 
-    from askhome.exceptions import
+    from askhome.exceptions import ValueOutOfRangeError
 
     class Heater(Appliance):
         @Appliance.action

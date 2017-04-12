@@ -62,7 +62,7 @@ class Request(object):
         self.payload = data['payload']
         self.name = self.header['name']
         self.access_token = self.payload.get('accessToken', None)
-        self.custom_data = None
+        self.custom_data = {}
 
     @property
     def appliance_id(self):

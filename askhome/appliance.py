@@ -87,9 +87,10 @@ class Appliance(object):
         method references. Action names are formatted for the DiscoverAppliancesRequest.
         """
         ret = {}
-        for method in cls.__dict__.values():
-            for action in getattr(method, 'ask_actions', []):
-                ret[get_action_string(action)] = method
+        for supercls in cls.__mro__: # This makes inherited Appliances work
+            for method in supercls.__dict__.values():
+                for action in getattr(method, 'ask_actions', []):
+                    ret[get_action_string(action)] = method
 
         return ret
 
@@ -100,9 +101,10 @@ class Appliance(object):
         formatted as TurnOnRequest.
         """
         ret = {}
-        for method in cls.__dict__.values():
-            for action in getattr(method, 'ask_actions', []):
-                ret[get_request_string(action)] = method
+        for supercls in cls.__mro__:  # This makes inherited Appliances work
+            for method in supercls.__dict__.values():
+                for action in getattr(method, 'ask_actions', []):
+                    ret[get_request_string(action)] = method
 
         return ret
 

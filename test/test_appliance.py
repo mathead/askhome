@@ -62,3 +62,20 @@ def test_init():
 
     assert appliance.id == 'light1'
     assert appliance.additional_details == {'foo': 'bar'}
+
+
+def test_inherited_actions():
+    class Light(Appliance):
+        @Appliance.action
+        def turn_on(self, request):
+            return 1
+
+    class Light2(Light):
+        @Appliance.action
+        def turn_off(self, request):
+            return 2
+
+    assert Light2.actions == {
+        'turnOn': Light2.turn_on.__func__,
+        'turnOff': Light2.turn_off.__func__,
+    }
