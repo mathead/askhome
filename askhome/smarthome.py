@@ -24,7 +24,7 @@ class Smarthome(object):
         self._discover_func = None
         self._get_appliance_func = None
         self._healthcheck_func = None
-        self._prepare_request_func = None
+        self._prepare_func = None
 
     def add_appliance(self, appl_id, appl_class, name=None, description=None,
                       additional_details=None, model=None, version=None, manufacturer=None,
@@ -79,11 +79,11 @@ class Smarthome(object):
         }
         self.appliances[appl_id] = (appl_class, details)
 
-    def prepare_request_handler(self, func):
+    def prepare_handler(self, func):
         """Decorator for a function that gets called before every request. Useful to modify the
         request processed, for instance add data to ``Request.custom_data``
         """
-        self._prepare_request_func = func
+        self._prepare_func = func
         return func
 
     def discover_handler(self, func):
@@ -125,8 +125,8 @@ class Smarthome(object):
 
         try:
             # Handle prepare request
-            if self._prepare_request_func is not None:
-                self._prepare_request_func(request)
+            if self._prepare_func is not None:
+                self._prepare_func(request)
 
             # Handle discover request
             if request.name == 'DiscoverAppliancesRequest':
@@ -163,5 +163,5 @@ class Smarthome(object):
 
         except AskhomeException as exception:
             response = request.exception_response(exception)
-            logger.info('Exception raised: %r, %s', exception, response)
+            logger.info('Exception raised: %r, %s', exception, response, exc_info=True)
             return response

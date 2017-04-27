@@ -87,7 +87,7 @@ class Appliance(object):
         method references. Action names are formatted for the DiscoverAppliancesRequest.
         """
         ret = {}
-        for supercls in cls.__mro__: # This makes inherited Appliances work
+        for supercls in cls.__mro__:  # This makes inherited Appliances work
             for method in supercls.__dict__.values():
                 for action in getattr(method, 'ask_actions', []):
                     ret[get_action_string(action)] = method

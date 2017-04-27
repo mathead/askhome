@@ -1,4 +1,4 @@
-import pytest, askhome
+import pytest
 
 from askhome import Smarthome, Appliance
 from askhome.exceptions import TargetOfflineError
@@ -42,7 +42,7 @@ def test_handle_discover(discover_request, discover_response, Light):
     assert response == discover_response
 
 
-def test_prepare_request_decorator():
+def test_prepare_decorator():
     class Light(Appliance):
         @Appliance.action
         def turn_on(self, request):
@@ -51,8 +51,8 @@ def test_prepare_request_decorator():
     home = Smarthome()
     home.add_appliance('light1', Light)
 
-    @home.prepare_request_handler
-    def prepare_request(request):
+    @home.prepare_handler
+    def prepare(request):
         request.custom_data = 'bar'
 
     request = {

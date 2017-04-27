@@ -61,15 +61,17 @@ User Data
 Often you will still need to query for some information about the user that sent the request. For
 that, there is another :class:`Smarthome <askhome.Smarthome>` decorator::
 
-    @home.prepare_request_handler
-    def prepare_request(request):
+    @home.prepare_handler
+    def prepare(request):
         # Query the database for ip address of the user
         ip = '1.2.3.4'
         request.custom_data = {'user_ip': ip}
 
-The above ``prepare_request`` function gets called before every request is processed. We save our
+The above ``prepare`` function gets called before every request is processed. We save our
 user data to :attr:`Request.custom_data <askhome.requests.Request.custom_data>` attribute, which we
 can use in any of our action methods.
+
+.. TODO extend docs of prepare_handler
 
 .. links
 .. _additional_details: https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference#payload-1

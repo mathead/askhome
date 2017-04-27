@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/mathead/askhome.svg?branch=master)](https://travis-ci.org/mathead/askhome)
 [![codecov](https://codecov.io/gh/mathead/askhome/branch/master/graph/badge.svg)](https://codecov.io/gh/mathead/askhome)
 
-Askhome wraps the [Smart Home Skill API](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference) for Amazon Echo and removes all that ugly boilerplate.
+Askhome wraps the [Smart Home Skill API](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference) from Alexa Skills Kit (ASK) for Amazon Echo and removes all that ugly boilerplate.
 
 Basic skill in askhome looks like this:
 ```python

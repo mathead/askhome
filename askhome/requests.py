@@ -51,7 +51,7 @@ class Request(object):
         name (str): Request name from the ``name`` field in header.
         access_token (str): OAuth token from the ``accessToken`` field in payload.
         custom_data (Any): Attribute for saving custom data through
-            ``Smarthome.prepare_request_handler``
+            ``Smarthome.prepare_handler``
 
     """
     def __init__(self, data, context=None):

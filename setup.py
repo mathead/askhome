@@ -4,7 +4,7 @@ from distutils.core import setup
 setup(
     name='askhome',
     packages=['askhome'],
-    version='0.1.1',
+    version='0.1.2',
     author=u'Matěj Hlaváček',
     author_email='hlavacek.matej@gmail.com',
     url='https://github.com/mathead/askhome',
