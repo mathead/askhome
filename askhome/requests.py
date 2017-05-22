@@ -206,7 +206,7 @@ class ChangeTemperatureRequest(Request):
 class GetTargetTemperatureRequest(Request):
     """Request class for Alexa GetTargetTemperatureRequest."""
     def response(self, temperature=None, cooling_temperature=None, heating_temperature=None,
-                 mode=None, mode_name=None, timestamp=None):
+                 mode='AUTO', mode_name=None, timestamp=None):
         """
         Args:
             temperature (float): Target temperature set by the device, in degrees Celsius.

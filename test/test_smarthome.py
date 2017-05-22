@@ -414,6 +414,9 @@ def test_full_usage(discover_request):
         'payload': {
             'targetTemperature': {
                 'value': 27.6
+            },
+            'temperatureMode': {
+                'value': 'AUTO'
             }
         }
     }
