@@ -172,7 +172,7 @@ class ChangeTemperatureRequest(Request):
             return None
         return self.payload['deltaTemperature']['value']
 
-    def response(self, temperature, mode='AUTO', previous_temperature=None, previous_mode='AUTO'):
+    def response(self, temperature, mode=None, previous_temperature=None, previous_mode=None):
         """
         Args:
             temperature (float): Target temperature set by the device, in degrees Celsius.
@@ -182,23 +182,23 @@ class ChangeTemperatureRequest(Request):
         """
         payload = {
             'targetTemperature': {
-                "value": temperature
-            },
-            'temperatureMode': {
-                'value': mode
+                'value': temperature
             }
         }
+
+        if mode is not None:
+            payload['temperatureMode'] = {'value': mode}
 
         # Even though the docs say the previousState is required, it works fine without it
         if previous_temperature is not None:
             payload['previousState'] = {
                 'targetTemperature': {
                     'value': previous_temperature
-                },
-                'mode': {
-                    'value': previous_mode
                 }
             }
+
+            if previous_mode is not None:
+                payload['previousState']['mode'] = {'value': previous_mode}
 
         return self.raw_response(payload)
 
@@ -206,7 +206,7 @@ class ChangeTemperatureRequest(Request):
 class GetTargetTemperatureRequest(Request):
     """Request class for Alexa GetTargetTemperatureRequest."""
     def response(self, temperature=None, cooling_temperature=None, heating_temperature=None,
-                 mode='AUTO', mode_name=None, timestamp=None):
+                 mode=None, mode_name=None, timestamp=None):
         """
         Args:
             temperature (float): Target temperature set by the device, in degrees Celsius.
@@ -223,9 +223,7 @@ class GetTargetTemperatureRequest(Request):
             timestamp (datetime|str): Time when the information was last retrieved.
 
         """
-        payload = {
-            'temperatureMode': {'value': mode}
-        }
+        payload = {}
 
         if temperature is not None:
             payload['targetTemperature'] = {'value': temperature}
@@ -233,6 +231,8 @@ class GetTargetTemperatureRequest(Request):
             payload['coolingTargetTemperature'] = {'value': cooling_temperature}
         if heating_temperature is not None:
             payload['heatingTargetTemperature'] = {'value': heating_temperature}
+        if mode is not None:
+            payload['temperatureMode'] = {'value': mode}
         if mode_name is not None:
             payload['temperatureMode']['friendlyName'] = mode_name
         # Add timestamp to payload if set

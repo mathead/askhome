@@ -79,9 +79,6 @@ def test_increment_temperature_response():
         },
         'payload': {
             'previousState': {
-                'mode': {
-                    'value': 'AUTO'
-                },
                 'targetTemperature': {
                     'value': 27.6
                 }
