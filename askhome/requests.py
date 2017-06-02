@@ -149,13 +149,13 @@ class PercentageRequest(Request):
     def percentage(self):
         if 'percentageState' not in self.payload:
             return None
-        return self.payload['percentageState']['value']
+        return float(self.payload['percentageState']['value'])
 
     @property
     def delta_percentage(self):
         if 'deltaPercentage' not in self.payload:
             return None
-        return self.payload['deltaPercentage']['value']
+        return float(self.payload['deltaPercentage']['value'])
 
 
 class ChangeTemperatureRequest(Request):
@@ -164,13 +164,13 @@ class ChangeTemperatureRequest(Request):
     def temperature(self):
         if 'targetTemperature' not in self.payload:
             return None
-        return self.payload['targetTemperature']['value']
+        return float(self.payload['targetTemperature']['value'])
 
     @property
     def delta_temperature(self):
         if 'deltaTemperature' not in self.payload:
             return None
-        return self.payload['deltaTemperature']['value']
+        return float(self.payload['deltaTemperature']['value'])
 
     def response(self, temperature, mode=None, previous_temperature=None, previous_mode=None):
         """
